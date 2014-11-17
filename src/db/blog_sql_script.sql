@@ -1,5 +1,5 @@
 /**************CREATE DATABASE BLOG *********************/
-CREATE DATABASE blog;
+CREATE DATABASE blog CHARACTER SET utf8 COLLATE utf8_general_ci;
 use blog;
 
 
@@ -11,6 +11,8 @@ password varchar(255) not null,
 email varchar(100) not null,
 lastname varchar(50) not null,
 firstname varchar(50) not null,
+created_at int(11) not null,
+modified_at int(11) not null,
 last_login int(11) not null,
 login_hash varchar(255) not null,
 status int(1) not null default 1,
