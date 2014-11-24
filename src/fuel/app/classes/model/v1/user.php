@@ -20,7 +20,7 @@ class User extends Model{
 	public static function validate_user()
 	{
 		//forge user to validation
-		$val=Validation::forge('user');
+		$val = Validation::forge('user');
 		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]');
 		$val->add_field('password', 'Password', 'required|min_length[5]');
 		$val->add_field('email','Email address','required|valid_email');
@@ -33,13 +33,13 @@ class User extends Model{
 		$val->set_message('valid_email', 'Email incorrect');
 		
 		//create message array
-		$messages=array();
+		$messages = array();
 		if(!$val->run(array())){
 			
 			foreach($val->error_message() as $field => $message)
 			{
 				//add error message to array for return
-				$messages[]= array('message'=>$message);
+				$messages[] = array('message' => $message);
 			}
 			//return error message
 			return $messages;
@@ -57,9 +57,9 @@ class User extends Model{
 	public static function check_user_exist($username){
 		//try catch to execute query db
 	try{
-			$entry=DB::select('username')->from('user')->where('username','=',$username)->execute();
+			$entry = DB::select('username')->from('user')->where('username','=',$username)->execute();
 						
-			if(count($entry)>0)
+			if(count($entry) > 0)
 			{
 				return true;//exist
 			}else{
@@ -82,7 +82,7 @@ class User extends Model{
 		//try catch for insert
 		try{
 			//insert query
-			$entry=DB::insert('user')->columns(
+			$entry = DB::insert('user')->columns(
 					array(
 							'username',
 							'password',
@@ -115,17 +115,17 @@ class User extends Model{
 	public static function create_token($username,$password){
 		//use auth login to creat token and insert db
 		
-		$rs=0;
+		$rs = 0;
 	    if(Auth::login($username,$password)){
 			
-			$data['id']=Auth::get('id');
-			$data['username']=Auth::get('username');
-			$data['lastname']=Auth::get('lastname');
-			$data['firstname']=Auth::get('firstname');
-			$data['created_at']=date('Y-m-d',Auth::get('created_at'));
-			$data['modified_at']=date('Y-m-d',Auth::get('modified_at'));
-			$data['email']=Auth::get('email');
-			$data['token']=Auth::get('login_hash');
+			$data['id'] = Auth::get('id');
+			$data['username'] = Auth::get('username');
+			$data['lastname'] = Auth::get('lastname');
+			$data['firstname'] = Auth::get('firstname');
+			$data['created_at'] = date('Y-m-d',Auth::get('created_at'));
+			$data['modified_at'] = date('Y-m-d',Auth::get('modified_at'));
+			$data['email'] = Auth::get('email');
+			$data['token'] = Auth::get('login_hash');
 			
 			return $data;
 		}else return $rs;
