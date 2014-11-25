@@ -1,3 +1,3 @@
 blog
 ====
-test
+API spec and detail design.
