@@ -2,6 +2,7 @@
 use Model\V1\User;
 use Fuel\Core\Controller_Rest;
 use Auth\Auth;
+use Fuel\Core\Validation;
 
 /**
  * The User Controller.
@@ -41,36 +42,25 @@ class Controller_V1_User extends Controller_Rest {
 		$filters = array('strip_tags', 'htmlentities', '\\cleaners\\soap::clean');
 		
 		//username use to login the system
-		$data['username'] 	= Security::clean(Input::post('username'),$filters);
+		$data['username'] = Security::clean(Input::post('username'),$filters);
 		//email use to login the system
-		$data['email'] 		= Input::post('email');
+		$data['email'] = Input::post('email');
 		//password use to login, will be encrypted
-		$data['password'] 	= Security::clean(Input::post('password'),$filters);
+		$data['password'] = Security::clean(Input::post('password'),$filters);
 		
 		//information of user
-		$data['lastname'] 	= Input::post('lastname');
-		$data['firstname'] 	= Input::post('firstname');
+		$data['lastname'] = Input::post('lastname');
+		$data['firstname'] = Input::post('firstname');
 		
-		//validation data user
-		$val 			= User::validate_user('user');
+		//validation data user		
+		$result = User::validate_user('user');
 		//var_dump($val);die;
 		//have error message
-		if ( ! $val->run()) {
-			//create a data for contain all error message
-			$_error = array();
-						
-			foreach ($val->error() as $field =>$error)
-			{					//add error message to array for return
-				$_error[] = array('message' => $error->get_message);
-			}
+		if ( $result !== true ) {
+			
 			//response the error code and message;
-			$code = '1001';
-			return $this->response(array(
-			    'meta' => array(
-				'code' => $code,
-				'description' => 'Input validation failed',
-				'message' => $_error
-			),'data' => null));
+			//the code is 1001
+			return $this->response( $result );
 		
 		} else {
 			//return 1 for valid data
@@ -78,14 +68,14 @@ class Controller_V1_User extends Controller_Rest {
 			//try catch to check and insert user into db
 			try	{
 				//check username exist or not return true if exist, else return false
-				$status = User::check_user_exist($data['username']);	
+				$status = User::check_user_exist( $data['username'] );	
 				//return $this->response(array($status));
 								
-				if ($status) {
+				if ( $status ) {
 					
 					//return error code and message
 					$code = '2001';
-					return $this->response(array(
+					return $this->response( array(
 					        'meta' => array(
 							'code' => $code,
 							'description' => 'Username exist in database',
@@ -97,12 +87,12 @@ class Controller_V1_User extends Controller_Rest {
 					//insert db
 					//set date time for create account and modified by current date time
 					$time = time();
-					$data['created_at'] 	= $time;
-					$data['modified_at'] 	= $time;	
+					$data['created_at'] = $time;
+					$data['modified_at'] = $time;	
 								
 					//hash password before insert into db
 					//hash password by auth package, password become :12ac1f48d9649....**
-					$data['password'] 		= Auth::hash_password($data['password']);
+					$data['password'] = Auth::hash_password($data['password']);
 					$rs = User::create_user($data);
 					
 					if ($rs) {
@@ -119,7 +109,7 @@ class Controller_V1_User extends Controller_Rest {
 					//response code 200 for success
 					$code = '200';
 					
-					return $this->response(array(
+					return $this->response( array(
 					    'meta' => array(
 						'code' => $code,
 						 'message' => 'Account created success',
@@ -129,7 +119,7 @@ class Controller_V1_User extends Controller_Rest {
 					} else {
 						
 						$code = '9005';
-						return $this->response(array(
+						return $this->response( array(
 						        'meta' => array(
 								'code' => $code,
 								'description' => 'can\'t insert into database',

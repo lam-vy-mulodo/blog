@@ -22,11 +22,11 @@ class User extends Model {
 	/*
 	 * method validation for check information input to database
 	 */
-	public $validation;
+	
 	
 	public static function validate_user($factory) {
-				
-		$val = Validation::forge($factory);
+		
+		$val = Validation::forge($factory);		
 		
 		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]');
 		$val->add_field('password', 'Password', 'required|min_length[5]');
@@ -39,22 +39,29 @@ class User extends Model {
 		$val->set_message('min_length', 'Username and password must be contain at least 5 characters');
 		$val->set_message('max_length', 'Username may contain more than 50 characters');
 		$val->set_message('valid_email', 'Email incorrect');
-		return  $val;
+		
 		//create message array
-		/*$_error = array();
-		if (!$val->run()) {
+		$_error = array();
+		if (!$val->run(array())) {
 			
 			foreach ($val->error() as $field =>$error)
 			{
 				//add error message to array for return
-				$_error[] = array('message' => $error->get_message);
+				$_error[] = array('message' => $error->get_message());
 			}
 			//return error message
-			return $_error;
+			$code = '1001';
+			return array(
+			    'meta' => array(
+				'code' => $code,
+				'description' => 'Input validation failed',
+				'message' => $_error
+			),'data' => null);
+			
 		} else {
 			//return 1 for valid all data
-			return 1;
-		}*/
+			return true;
+		}
 		
 	}
 	
@@ -67,10 +74,9 @@ class User extends Model {
 		//try catch to execute query db
 	try {
 			$entry = DB::select('username')->from('user')->where('username','=',$username)->execute();
-						
+			//exist
 			if (count($entry) > 0) {
-				
-				return true;//exist
+				return true;
 				
 			} else {
 				
@@ -100,9 +106,9 @@ class User extends Model {
 							'email','lastname',
 							'firstname',
 							'created_at',
-							
-			'modified_at'))
-			->values(array(
+							'modified_at'))
+			->values( 
+				array(
 					$data['username'],
 					$data['password'],
 					$data['email'],
@@ -134,14 +140,14 @@ class User extends Model {
 		$rs = 0;
 	    if (Auth::login($username,$password)) {
 			
-			$data['id'] 			= 	Auth::get('id');
-			$data['username'] 		= 	Auth::get('username');
-			$data['lastname'] 		= 	Auth::get('lastname');
-			$data['firstname'] 		= 	Auth::get('firstname');
-			$data['created_at'] 	= 	date('Y-m-d',Auth::get('created_at'));
-			$data['modified_at'] 	= 	date('Y-m-d',Auth::get('modified_at'));
-			$data['email'] 			= 	Auth::get('email');
-			$data['token'] 			= 	Auth::get('login_hash');
+			$data['id'] = Auth::get('id');
+			$data['username'] =	Auth::get('username');
+			$data['lastname'] = Auth::get('lastname');
+			$data['firstname'] = Auth::get('firstname');
+			$data['created_at'] = date('Y-m-d',Auth::get('created_at'));
+			$data['modified_at'] = date('Y-m-d',Auth::get('modified_at'));
+			$data['email'] = Auth::get('email');
+			$data['token'] = Auth::get('login_hash');
 			
 			return $data;
 		} 	else 
