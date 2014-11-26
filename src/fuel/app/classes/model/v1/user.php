@@ -24,12 +24,14 @@ class User extends Model {
 	 */
 	
 	
-	public static function validate_user($factory) {
+	public static function validate_user($factory) {	
+			
+		//$fieldset = Fieldset::instance('user');
+		//$val = Validation::forge($fieldset);
+		$val = Validation::forge($factory);
 		
-		$val = Validation::forge($factory);		
-		
-		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]');
-		$val->add_field('password', 'Password', 'required|min_length[5]');
+		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');
+		$val->add_field('password', 'Password', 'required|min_length[5]|valid_string[alpha,numeric]');
 		$val->add_field('email','Email address','required|valid_email');
 		$val->add_field('lastname', 'Last name', 'required');
 		$val->add_field('firstname', 'First name', 'required');
@@ -39,6 +41,8 @@ class User extends Model {
 		$val->set_message('min_length', 'Username and password must be contain at least 5 characters');
 		$val->set_message('max_length', 'Username may contain more than 50 characters');
 		$val->set_message('valid_email', 'Email incorrect');
+		$val->set_message('valid_string', 'Username or password may contain special characters');
+		
 		
 		//create message array
 		$_error = array();
@@ -49,6 +53,8 @@ class User extends Model {
 				//add error message to array for return
 				$_error[] = array('message' => $error->get_message());
 			}
+			
+			
 			//return error message
 			$code = '1001';
 			return array(
@@ -57,6 +63,7 @@ class User extends Model {
 				'description' => 'Input validation failed',
 				'message' => $_error
 			),'data' => null);
+			
 			
 		} else {
 			//return 1 for valid all data
@@ -116,9 +123,11 @@ class User extends Model {
 					$data['firstname'],
 					$data['created_at'],
 					$data['modified_at']));
-			$entry->execute();
 			
-			return true;	
+			$result = $entry->execute();
+			
+			//Return id of username inserted
+			return $result[0];	
 			
 		} catch (\Exception $ex) {
 			//write error to log
