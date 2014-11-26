@@ -5,7 +5,7 @@ use blog;
 
 /*************CREATE TABLE user**********************/
 CREATE TABLE IF NOT EXISTS user(
-id INT(11) not null auto_increment,
+id INT(11) not null auto_increment primary key,
 username varchar(50) not null,
 password varchar(255) not null,
 email varchar(100) not null,
@@ -16,7 +16,7 @@ modified_at int(11) not null,
 last_login int(11) not null,
 login_hash varchar(255) not null,
 status int(1) not null default 1,
-primary key(id)
+FULLTEXT INDEX(username,lastname,firstname)
 )engine=InnoDB charset='utf8' auto_increment=1;
 
 
