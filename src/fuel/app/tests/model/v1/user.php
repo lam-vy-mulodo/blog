@@ -56,7 +56,7 @@ class Test_Model_V1_User extends TestCase {
 	 * @group exist_user_ok
 	 * 
 	 */
-    public function test_check_user_exist($testdata = 'thuyvy') {
+    public function test_check_user_exist_ok($testdata = 'thuyvy') {
     	
     	$rs = $this->_user->check_user_exist( $testdata ) ;
     	//var_dump($rs) ; die;

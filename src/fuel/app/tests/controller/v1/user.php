@@ -110,33 +110,7 @@ class Test_Controller_V1_User extends TestCase {
 		self::remove_user($res['data']['id']) ;
 	}
 	
-	/**
-	 * function to test create user not ok
-	 * 
-	 * before run this test, stop execute query insert in model user
-	 * return 0 if not record created
-	 * error code 9005
-	 * @group create_user_not_ok
-	 *
-	 */
-	public function test_create_user_not_ok() {
 	
-		//create data to test, username is existed in db
-		$test_data = array();
-		$test_data = array(
-				'username' => 'thuyvy9999',
-				'password' => '12345',
-				'firstname' => 'vy',
-				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
-		);
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
-		$res =  $this->init_curl($test_data, $method, $link) ;
-		print_r($res) ;
-		$this->assertEquals(9005, $res['meta']['code']);
-	}
-        
     /**
      * function to init curl used to api
      * set method, link for request

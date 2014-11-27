@@ -126,7 +126,7 @@ class User extends Model {
 			) );
 			
 			
-			// stop execute query for test
+			
 			
 			$result = $entry->execute ();
 			
