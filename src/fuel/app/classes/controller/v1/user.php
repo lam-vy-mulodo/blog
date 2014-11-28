@@ -53,7 +53,7 @@ class Controller_V1_User extends Controller_Rest {
 		$data['firstname'] = Input::post('firstname');
 		
 		//validation data user		
-		$result = User::validate_user('user');
+		$result = User::validate_user($data);
 		//var_dump($val);die;
 		//have error message
 		if ( $result !== true ) {
@@ -95,7 +95,7 @@ class Controller_V1_User extends Controller_Rest {
 					$data['password'] = Auth::hash_password($data['password']);
 					$rs = User::create_user($data);
 					
-					if ($rs) {
+					if ($rs > 0) {
 						
 					/*
 					 * login and create token for new user,use password before encrypted
