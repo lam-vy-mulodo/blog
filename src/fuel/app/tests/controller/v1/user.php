@@ -85,7 +85,7 @@ class Test_Controller_V1_User extends TestCase {
 		//create data to test, username is not existed in db, valid data to validation
 		$test_data = array();
 		$test_data = array(
-				'username' => 'thuyvy9999',
+				'username' => 'thuyvy1010',
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',

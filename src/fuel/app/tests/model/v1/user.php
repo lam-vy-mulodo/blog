@@ -44,9 +44,12 @@ class Test_Model_V1_User extends TestCase {
 		//	
 		$User = $this->_user;		
 		$val = $User::validate_user($data);						
-		print_r($val['meta']['message']);
-		
+		//print_r($val['meta']['message']);
+		if( $val!=1 ) {
 		$this->assertEquals(1001,$val['meta']['code']);
+		} else {
+			$this->assertEquals(true,$val);
+		}
 		
 	}
 	
@@ -68,7 +71,7 @@ class Test_Model_V1_User extends TestCase {
      * @group exist_user_not_ok
      *
      */
-    public function test_check_user_not_exist($testdata = 'thuyvy999') {
+    public function test_check_user_not_exist($testdata = 'thuyvy1010') {
     	 
     	$rs = $this->_user->check_user_exist( $testdata ) ;
     	//var_dump($rs) ; die;
@@ -239,7 +242,14 @@ class Test_Model_V1_User extends TestCase {
     			'lastname' => 'Lam',
     			'email' => 'lam.vy.mulodo.com'
     	);
-    		
+    	//data valid
+    	$test_data[][] = array(
+    			'username' => 'thuyvy',
+    			'password' => '12345',
+    			'firstname' => 'vy',
+    			'lastname' => 'Lam',
+    			'email' => 'lam.vy@mulodo.com'
+    	);
     
     	return $test_data;
     }

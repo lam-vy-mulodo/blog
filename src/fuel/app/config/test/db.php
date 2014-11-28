@@ -8,9 +8,10 @@
 return array(
 	'default' => array(
 		'connection'  => array(
-			'dsn'        => 'mysql:host=localhost;dbname=blog_test',
+			'dsn'        => 'mysql:host=localhost;dbname=blog',
 			'username'   => 'root',
 			'password'   => '1234',
+			
 		),
 	),
 );
