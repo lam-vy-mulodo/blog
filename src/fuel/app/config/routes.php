@@ -9,5 +9,6 @@ return array(
 		
 	'(:version)/users' => array(array('GET', new Route('$1/user/index')),array('POST', new Route('$1/user/register'))
 ),
+	'(:version)/users/login' => array(array('POST', new Route('$1/user/login'))) ,
 	
 );

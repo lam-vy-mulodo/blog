@@ -141,6 +141,20 @@ class User extends Model {
 			return $ex->getMessage ();
 		}
 	}
+	/*
+	 * the method use to login
+	*/
+	public static function login($username, $password) {
+		
+		$rs = self::create_token($username, $password) ;
+		//login success
+		if( $rs != 0) {
+			return $rs ;
+		} else {
+			 return false ;
+		}
+		
+	}
 	
 	/*
 	 * method use to create token for user @use Auth package for create token token have format sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login)
@@ -163,6 +177,7 @@ class User extends Model {
 		} else
 			return $rs;
 	}
+	
 	
 	
 }
