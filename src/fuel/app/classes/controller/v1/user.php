@@ -14,6 +14,8 @@ use Fuel\Core\Validation;
 class Controller_V1_User extends Controller_Rest {
 	//return json format
 	protected $format = 'json';
+	//clean data
+	protected $filters = array('strip_tags', 'htmlentities', '\\cleaners\\soap::clean');
 	/**
 	 * The basic welcome message
 	 * @link http://localhost/v1/users/
@@ -38,15 +40,14 @@ class Controller_V1_User extends Controller_Rest {
 	 */
 	public function post_register() {
 		//create user data from input post
-		//clean data
-		$filters = array('strip_tags', 'htmlentities', '\\cleaners\\soap::clean');
+		
 		
 		//username use to login the system
-		$data['username'] = Security::clean(Input::post('username'),$filters);
+		$data['username'] = Security::clean(Input::post('username'),$this->filters);
 		//email use to login the system
 		$data['email'] = Input::post('email');
 		//password use to login, will be encrypted
-		$data['password'] = Security::clean(Input::post('password'),$filters);
+		$data['password'] = Security::clean(Input::post('password'),$this->filters);
 		
 		//information of user
 		$data['lastname'] = Input::post('lastname');
@@ -102,7 +103,7 @@ class Controller_V1_User extends Controller_Rest {
 					 * return data array contain information of user created 
 					 */
 					
-					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$filters));
+					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$this->filters));
 					
 					//add remember me cookie for check logged in
 					Auth::remember_me();
@@ -136,6 +137,65 @@ class Controller_V1_User extends Controller_Rest {
 			
 		}
 
+		
+	}
+	
+	/**
+	 * A function post_login to use login into blog
+	 * @link http://localhost/v1/users/login
+	 * method POST
+	 * @access  public
+	 * @return  Response
+	 */
+	public function post_login() {
+		
+		//check for logged
+		if (Auth::check()) {
+			
+			return $this->response(
+				array(
+					'meta' => array(
+						'code' => '1204',
+						'description' => 'You login more 1 times' ,
+						'messages' => 'You had logged'		
+					),
+					'data' => null
+				)		        	
+			);
+			
+		} else {
+			//set up data to login
+			$username = Security::clean(Input::post('username'),$this->filters);
+			$password = Security::clean(Input::post('password'),$this->filters);
+			$rs =  User::login($username,$password) ;
+			
+			if ( false != $rs) {
+				
+				//return code 200 and message
+				return $this->response( array(
+						'meta' => array(
+							'code' => '200',
+							'messages' => 'Login success !'
+						),
+						'data' => $rs 
+				)) ;
+			} else {
+				//set code for login failed
+				$code = 1203 ;
+					
+				return $this->response(array (
+						'meta' => array (
+								'code' => $code,
+								'description' => 'Username or password wrong . Or the user not exist in system',
+								'message' => 'Username or password incorrect.'
+						),
+						'data' => null
+				) );
+			}
+			
+		}
+		
+		
 		
 	}
 
