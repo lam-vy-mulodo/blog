@@ -84,7 +84,8 @@ class Controller_V1_User extends Controller_Rest {
 							'data' => null)
 					);
 				} else {
-									
+
+					DB::start_transaction() ;
 					//insert db
 					//set date time for create account and modified by current date time
 					$time = time();
@@ -103,8 +104,9 @@ class Controller_V1_User extends Controller_Rest {
 					 * return data array contain information of user created 
 					 */
 					
-					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$this->filters));
+					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$this->filters)); 
 					
+					DB::commit_transaction();
 					//add remember me cookie for check logged in
 					Auth::remember_me();
 					//response code 200 for success
@@ -117,7 +119,10 @@ class Controller_V1_User extends Controller_Rest {
 					),
 					'data' => $user,
 					));
+					
+					
 					} else {
+						DB::rollback_transaction();
 						
 						$code = '9005';
 						return $this->response( array(
@@ -132,6 +137,7 @@ class Controller_V1_User extends Controller_Rest {
 				
 			} catch (Exception $ex) {
 				
+				DB::rollback_transaction();
 				return $ex->getMessage();
 			}
 			

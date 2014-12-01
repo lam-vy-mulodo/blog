@@ -17,6 +17,7 @@ class User extends Model {
 	
 	/*
 	 * method validation for check information input to database
+	 * @return array error of input data
 	 */
 	public static function validate_user($data) {
 		//create input field from data
@@ -79,6 +80,7 @@ class User extends Model {
 	
 	/*
 	 * the method use to check username exist in database or not return true for exist else return false
+	 * @return boolean true for exist, false for not exist
 	 */
 	public static function check_user_exist($username) {
 		// try catch to execute query db
@@ -102,6 +104,7 @@ class User extends Model {
 	
 	/*
 	 * the method use to insert new account into user table return true for success else return error
+	 * @return new is of record inserted in db
 	 */
 	public static function create_user($data) {
 		// try catch for insert
@@ -143,6 +146,8 @@ class User extends Model {
 	}
 	/*
 	 * the method use to login
+	 * @return array data of user info and token to success
+	 * return false for if not success
 	*/
 	public static function login($username, $password) {
 		
@@ -158,9 +163,11 @@ class User extends Model {
 	
 	/*
 	 * method use to create token for user @use Auth package for create token token have format sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login)
+	 * return arar data user info
 	 */
 	public static function create_token($username, $password) {
 		// use auth login to creat token and insert db
+		//throw new \Exception('Test transaction') ;
 		$rs = 0;
 		if (Auth::login ( $username, $password )) {
 			
