@@ -186,7 +186,7 @@ class Test_Model_V1_User extends TestCase {
     			'username' => 'lam.vy',
     			'password' => '1234'
     	);
-    	 
+    	//test for sql injection 
     	$test_data[][] = array(
     			'username' => 'username` or 1 = 1 -- ',
     			'password' => '1234'
