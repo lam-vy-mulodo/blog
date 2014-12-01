@@ -84,7 +84,8 @@ class Controller_V1_User extends Controller_Rest {
 							'data' => null)
 					);
 				} else {
-
+					//start transaction
+					//user create in db and create token ok
 					DB::start_transaction() ;
 					//insert db
 					//set date time for create account and modified by current date time
@@ -105,7 +106,7 @@ class Controller_V1_User extends Controller_Rest {
 					 */
 					
 					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$this->filters)); 
-					
+					//commit transaction after insert and create token ok
 					DB::commit_transaction();
 					//add remember me cookie for check logged in
 					Auth::remember_me();
@@ -122,6 +123,7 @@ class Controller_V1_User extends Controller_Rest {
 					
 					
 					} else {
+						//rollback if faild
 						DB::rollback_transaction();
 						
 						$code = '9005';
