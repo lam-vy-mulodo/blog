@@ -148,8 +148,9 @@ class Test_Model_V1_User extends TestCase {
     	$username = 'thuyvy' ;
     	$password = '12345' ;
     	$rs = $this->_user->login($username, $password) ;
-    	//compare code return 200 to ok
-    	$this->assertEquals(200 , $rs['meta']['code']) ;
+    	//compare id return is greater than 0 is login ok
+    	
+    	$this->assertGreaterThan(0 , $rs['id']) ;
     	 
     }
     
@@ -165,7 +166,7 @@ class Test_Model_V1_User extends TestCase {
     	$username = $test_data['username'] ;
     	$password = $test_data['password'] ;
     	$rs = $this->_user->login($username, $password) ;
-    	//compare code return 200 to ok
+    	//compare boolean false  to check login not ok
     	$this->assertEquals(false , $rs) ;
     }
     

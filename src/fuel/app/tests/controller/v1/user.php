@@ -152,6 +152,7 @@ class Test_Controller_V1_User extends TestCase {
 		
 	}
 	
+	
 	/**
 	 * Define test data for check login not ok
 	 *

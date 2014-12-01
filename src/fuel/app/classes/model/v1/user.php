@@ -17,6 +17,7 @@ class User extends Model {
 	
 	/*
 	 * method validation for check information input to database
+	 * input data  recieve from post method
 	 * @return array error of input data
 	 */
 	public static function validate_user($data) {
