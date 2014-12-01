@@ -138,7 +138,63 @@ class Test_Model_V1_User extends TestCase {
     	
     }
    
-
+    /**
+     * function to test login ok
+     * @group login_ok
+     *
+     */
+    public function test_login_ok() {
+    	//create data to test ok
+    	$username = 'thuyvy' ;
+    	$password = '12345' ;
+    	$rs = $this->_user->login($username, $password) ;
+    	//compare code return 200 to ok
+    	$this->assertEquals(200 , $rs['meta']['code']) ;
+    	 
+    }
+    
+    
+    /**
+     * function to test login not ok
+     * @group login_not_ok
+     * @dataProvider login_not_provider
+     */
+    public function test_login_not_ok($test_data) {
+    	//create data to test ok
+    	 
+    	$username = $test_data['username'] ;
+    	$password = $test_data['password'] ;
+    	$rs = $this->_user->login($username, $password) ;
+    	//compare code return 200 to ok
+    	$this->assertEquals(false , $rs) ;
+    }
+    
+    /**
+     * Define test data for check login not ok
+     *
+     * @return array Test data
+     */
+    
+    public function login_not_provider() {
+    	$test_data = array() ;
+    	//username not exist
+    	$test_data[][] = array(
+    			'username' => 'thuyvy88',
+    			'password' => '1234'
+    	);
+    	$test_data[][] = array(
+    			'username' => 'lam.vy',
+    			'password' => '1234'
+    	);
+    	 
+    	$test_data[][] = array(
+    			'username' => 'username` or 1 = 1 -- ',
+    			'password' => '1234'
+    	);
+    	 
+    	return $test_data ;
+    }
+    
     /**
      * Define test data set
      *
