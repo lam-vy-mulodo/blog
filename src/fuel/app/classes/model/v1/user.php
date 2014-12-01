@@ -17,6 +17,7 @@ class User extends Model {
 	
 	/*
 	 * method validation for check information input to database
+	 * input data  recieve from post method
 	 * @return array error of input data
 	 */
 	public static function validate_user($data) {
@@ -105,6 +106,7 @@ class User extends Model {
 	/*
 	 * the method use to insert new account into user table return true for success else return error
 	 * @return new is of record inserted in db
+	 * data is user info recieved from post_register in controller
 	 */
 	public static function create_user($data) {
 		// try catch for insert
@@ -146,6 +148,7 @@ class User extends Model {
 	}
 	/*
 	 * the method use to login
+	 * recieve param from Post method
 	 * @return array data of user info and token to success
 	 * return false for if not success
 	*/
@@ -163,7 +166,8 @@ class User extends Model {
 	
 	/*
 	 * method use to create token for user @use Auth package for create token token have format sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login)
-	 * return arar data user info
+	 * return array data user info
+	 * called after login or create user success.
 	 */
 	public static function create_token($username, $password) {
 		// use auth login to creat token and insert db

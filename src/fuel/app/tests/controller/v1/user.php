@@ -4,6 +4,7 @@
 use Fuel\Core\Input;
 use Fuel\Core\Request;
 use Fuel\Core\DB;
+use Auth\Auth;
 /**
  * The Test for User Controller version 1.
  * @extends TestCase
@@ -110,6 +111,73 @@ class Test_Controller_V1_User extends TestCase {
 		self::remove_user($res['data']['id']) ;
 	}
 	
+	/**
+	 * function to test check login ok
+	 * return code 200
+	 * @link http://localhost/_blog/blog/src/v1/users/login
+	 * @group login
+	 *
+	 */
+	public function test_login_ok() {
+		//login first for test
+		$data['username'] = 'thuyvy' ;
+		$data['password'] = '12345' ;
+	
+		//call curl for login
+		$method = 'POST' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
+		$rs = $this->init_curl($data, $method, $link) ;
+		//compare rs code for 1204
+		//print_r($rs) ;
+		$this->assertEquals($rs['meta']['code'], '200') ;
+	
+	}
+	/**
+	 * used check login not ok, compare code 1203
+	 * @link http://localhost/_blog/blog/src/v1/users/login
+	 * @group login
+	 * @dataProvider login_not_provider
+	 */
+	public function test_login_not_ok($test_data) {
+			
+		
+		//call curl for login
+		$method = 'POST' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
+		$rs = $this->init_curl($test_data, $method, $link) ;
+	
+		//compare rs code for 1204
+		//print_r($rs) ; die ;
+		$this->assertEquals($rs['meta']['code'], '1203') ;
+		
+	}
+	
+	
+	/**
+	 * Define test data for check login not ok
+	 *
+	 * @return array Test data
+	 */
+	
+	public function login_not_provider() {
+		$test_data = array() ;
+		//username not exist
+		$test_data[][] = array(
+				'username' => 'thuyvy88',
+				'password' => '1234'
+		);
+		$test_data[][] = array(
+				'username' => 'lam.vy',
+				'password' => '1234'
+		);
+		//test for sql injection
+		$test_data[][] = array(
+				'username' => 'username` or 1 = 1 -- ',
+				'password' => '1234'
+		);
+	
+		return $test_data ;
+	}
 	
     /**
      * function to init curl used to api
@@ -119,8 +187,10 @@ class Test_Controller_V1_User extends TestCase {
      */
     public function init_curl($test_data,$method,$link) {
     	
+    	
     	// create a Request_Curl object
     	$curl = Request::forge($link, 'curl');
+    	
     	// this is going to be an HTTP POST
     	$curl->set_method($method);
     	// set some parameters    	
