@@ -169,7 +169,7 @@ class Controller_V1_User extends Controller_Rest {
 			$password = Security::clean(Input::post('password'),$this->filters);
 			$rs =  User::login($username,$password) ;
 			
-			if ( $rs != false) {
+			if ( false != $rs) {
 				
 				//return code 200 and message
 				return $this->response( array(
