@@ -228,6 +228,7 @@ class Controller_V1_User extends Controller_Rest {
 			if ( true === $rs ) {
 				//called logout from model to update token = null
 				$row = User::logout($token) ;
+				//check rows affected is > 0 logout ok
 				
 				//reset session
 				Auth::logout() ;
@@ -240,6 +241,7 @@ class Controller_V1_User extends Controller_Rest {
 						) ,
 						'data' => null
 				));
+				 
 				
 			} else {
 				//response error message return if check token wrong
