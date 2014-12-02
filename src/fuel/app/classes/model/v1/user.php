@@ -222,13 +222,14 @@ class User extends Model {
 	 * method to use is logout
 	 * input data is token
 	 * update login_hash =null by token input
-	 * return row is boolean
+	 * 
 	 */
 	public static function logout($token) {
 		try {
 			//update token
-			$query = DB::update('user')->value('login_hash', '')->where('login_hash','=',$token)->execute() ;
-			
+			$row = DB::update('user')->value('login_hash', '')->where('login_hash','=',$token)->execute() ;
+			//return number of row affected
+			// return $row ;
 		} catch (\Exception $ex) {
 			Log::error($ex->getMessage()) ;
 			return $ex->getMessage() ;

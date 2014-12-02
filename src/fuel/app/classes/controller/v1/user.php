@@ -227,7 +227,8 @@ class Controller_V1_User extends Controller_Rest {
 
 			if ( true === $rs ) {
 				//called logout from model to update token = null
-				User::logout($token) ;
+				$row = User::logout($token) ;
+				
 				//reset session
 				Auth::logout() ;
 			
