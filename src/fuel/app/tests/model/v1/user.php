@@ -311,5 +311,73 @@ class Test_Model_V1_User extends TestCase {
     	return $test_data;
     }
     
+    /**
+     * function to test check token exist ok in db
+     * compare with boolean true
+     * @group check_token
+     */
+    public function test_token_exist_ok() {
+    	//first is login to create token in db 
+    	//get token return to test check    	
+    	$username = 'thuyvy' ;
+    	$password = '12345' ;
+    	$data = $this->_user->login($username, $password) ;
+    	$token = $data['token'] ;
+    	
+    	$result = User::check_token($token ) ;
+    	//compare result return with true - token exist
+    	$this->assertTrue($result) ;
+    	
+    	
+    }
     
+    /**
+     * function to test check token is not exist in db
+     * compare with return code is 1205
+     * @group check_token_notok
+     * @dataProvider token_provider
+     */
+    public function test_token_not_exist($test_data) {
+    	$rs = User::check_token($test_data) ;
+    	//compare with code return is 1205 for not exist token
+    	$this->assertEquals('1205', $rs['meta']['code']) ;
+    	
+    }
+    /**
+     * Define test data set
+     * create token by use sha1
+     * @return array Test data
+     */
+    public function token_provider() {
+    	$test_data = array();
+    	//loop for auto create
+    	for ($i = 0 ; $i < 10 ; $i++) {
+    		$test_data[][] = array('token' => sha1(time()) ) ;
+    	}
+    	
+    	return $test_data ;
+    }
+    /**
+     * function use to test logout ok
+     * input is token was create from login function
+     * compare number rows affected greate than 0
+     * @group logout
+     */
+    public function test_logout() {
+    	//first is login to create token in db 
+    	//get token return to test check    	
+    	$username = 'thuyvy' ;
+    	$password = '12345' ;
+    	$data = $this->_user->login($username, $password) ;
+    	$token = $data['token'] ;
+    	
+    	//call logout and compare with row affected
+    	$row = User::logout($token) ;
+    	$this->assertGreaterThan(0,$row) ;
+    	
+    	//call test token not exist in db is logout ok
+    	$result = User::check_token($token) ;
+    	//compare status with error code 1205
+    	$this->assertEquals('1205', $result['meta']['code']) ;
+    }
 }
