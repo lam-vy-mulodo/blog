@@ -330,4 +330,83 @@ class Test_Controller_V1_User extends TestCase {
 		return $test_data;
 	}
 	
+	/**
+	 * function to test check token is empty when logout
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/logout
+	 * compare with code error 1202
+	 * @group token_empty
+	 */
+	public function test_token_empty() {
+		//data
+		$test_data['token'] = '' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;
+		$method = 'PUT' ;
+		$rs = $this->init_curl($test_data, $method, $link) ;
+		//compare with error code 1202
+		
+		$this->assertEquals('1202' ,$rs['meta']['code']) ;
+		
+	}
+	/**
+	 * use test logout function
+	 * function to test check token is not exist in db
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/logout
+	 * compare with code error 1205
+	 * @group token_invalid
+	 * @dataProvider token_provider
+	 */
+	public function test_token_invalid($test_data) {
+		
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;		
+		$method = 'PUT' ;
+		//call curl request
+		$rs = $this->init_curl($test_data, $method, $link) ;
+		//compare with error code
+		
+		$this->assertEquals('1205',$rs['meta']['code']) ;
+	}
+	/**
+	 * Define test data set
+	 * create token by use sha1
+	 * @return array Test data
+	 */
+	public function token_provider() {
+		$test_data = array();
+		//loop for auto create
+		for ($i = 0 ; $i < 10 ; $i++) {
+			$test_data[][] = array('token' => sha1(time()));
+		}
+		 
+		return $test_data ;
+	}
+	
+	/**
+	 * use test logout function ok
+	 * get token from login, test with this token
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/logout
+	 * compare with code error 200
+	 * @group logout
+	 */
+	public function test_logout() {
+		//first is login
+		//login first for test
+		$data['username'] = 'thuyvy' ;
+		$data['password'] = '12345' ;
+	
+		//call curl for login
+		$method = 'POST' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
+		$rs = $this->init_curl($data, $method, $link) ;
+		//get token return from login
+		$test_data['token'] = $rs['data']['token'] ;
+		$method = 'PUT' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;
+		$rs = $this->init_curl($test_data, $method, $link) ;
+		//compare with code 200
+		$this->assertEquals('200', $rs['meta']['code']) ;
+		
+	}
 }

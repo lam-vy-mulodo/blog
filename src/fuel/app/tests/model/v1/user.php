@@ -352,7 +352,7 @@ class Test_Model_V1_User extends TestCase {
     	$test_data = array();
     	//loop for auto create
     	for ($i = 0 ; $i < 10 ; $i++) {
-    		$test_data[][] = sha1(time()) ;
+    		$test_data[][] = array('token' => sha1(time()) ) ;
     	}
     	
     	return $test_data ;

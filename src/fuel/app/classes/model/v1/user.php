@@ -195,6 +195,7 @@ class User extends Model {
 	 * if exist return true ; else return false;
 	 */
 	public static function check_token($token) {
+		
 		try {
 			$row = DB::select()->from('user')->where('login_hash',$token)->execute() ;
 			
