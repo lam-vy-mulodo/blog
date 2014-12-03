@@ -189,6 +189,51 @@ class User extends Model {
 			return $rs;
 	}
 	
-	
+	/*
+	 * method use to check a token exist in db 
+	 * token recieve method PUT
+	 * if exist return true ; else return false;
+	 */
+	public static function check_token($token) {
+		try {
+			$row = DB::select()->from('user')->where('login_hash',$token)->execute() ;
+			
+			//check by count row affected 
+			if ($row->count() > 0 ) {
+				//return true token is exist, can logout
+				return true ;
+			} else {
+				//return code is 1205 for login faild, token isn't exist in db 
+				return array(
+					'meta' => array(
+						'code' => '1205' ,
+						'description' => 'Access is denied.' ,
+						'messages' => 'Logout failed '
+				),
+					'data' => null
+				) ;
+			}
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage();
+		}
+	}
+	/*
+	 * method to use is logout
+	 * input data is token
+	 * update login_hash =null by token input
+	 * return row affected
+	 */
+	public static function logout($token) {
+		try {
+			//update token
+			$row = DB::update('user')->value('login_hash', '')->where('login_hash','=',$token)->execute() ;
+			//return number of row affected
+			return $row ;
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage() ;
+		}
+	}
 	
 }

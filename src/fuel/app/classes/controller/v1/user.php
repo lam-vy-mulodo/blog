@@ -3,6 +3,8 @@ use Model\V1\User;
 use Fuel\Core\Controller_Rest;
 use Auth\Auth;
 use Fuel\Core\Validation;
+use Fuel\Core\Security;
+use Fuel\Core\Input;
 
 /**
  * The User Controller.
@@ -207,7 +209,57 @@ class Controller_V1_User extends Controller_Rest {
 		
 	}
 
-	
+	/**
+	 * A function put_logout to use get out the blog
+	 * @link http://localhost/v1/users/logout
+	 * method PUT
+	 * @access  public
+	 * @return  Response
+	 */
+	public function put_logout() {
+		//get token from method put
+		$token =Input::put('token') ;
+		
+		//check token is not empty
+		if ( !empty($token) ) {
+			//checktoken is correct
+			$rs = User::check_token($token) ;
+
+			if ( true === $rs ) {
+				//called logout from model to update token = null
+				$row = User::logout($token) ;
+				//check rows affected is > 0 logout ok
+				
+				//reset session
+				Auth::logout() ;
+			
+				return $this->response(
+						array(
+						'meta' => array(
+								'code' => '200' ,
+								'messages' => 'Logout success!'
+						) ,
+						'data' => null
+				));
+				 
+				
+			} else {
+				//response error message return if check token wrong
+				return $this->response($rs) ;
+			}
+		} else {
+			//return error 1202 token invalid
+			return $this->response(
+					array(
+				'meta' => array(
+					'code' => '1202' ,
+					'description' => 'Token is empty' ,
+					'messages' => 'Token invalid'
+				) ,
+				'data' => null
+			));
+		}
+	}
 	
 	
 	 
