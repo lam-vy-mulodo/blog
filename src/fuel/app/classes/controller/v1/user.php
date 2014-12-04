@@ -17,7 +17,7 @@ class Controller_V1_User extends Controller_Rest {
 	//return json format
 	protected $format = 'json';
 	//clean data
-	protected $filters = array('strip_tags', 'htmlentities', '\\cleaners\\soap::clean');
+	protected $filters = array('strip_tags', 'htmlentities');
 	/**
 	 * The basic welcome message
 	 * @link http://localhost/v1/users/
@@ -47,13 +47,13 @@ class Controller_V1_User extends Controller_Rest {
 		//username use to login the system
 		$data['username'] = Security::clean(Input::post('username'),$this->filters);
 		//email use to login the system
-		$data['email'] = Input::post('email');
+		$data['email'] = Security::clean(Input::post('email'),$this->filters);
 		//password use to login, will be encrypted
 		$data['password'] = Security::clean(Input::post('password'),$this->filters);
 		
 		//information of user
-		$data['lastname'] = Input::post('lastname');
-		$data['firstname'] = Input::post('firstname');
+		$data['lastname'] = Security::clean(Input::post('lastname'),$this->filters);
+		$data['firstname'] = Security::clean(Input::post('firstname'),$this->filters);
 		
 		//validation data user		
 		$result = User::validate_user($data);
@@ -224,8 +224,8 @@ class Controller_V1_User extends Controller_Rest {
 		if ( !empty($token) ) {
 			//checktoken is correct
 			$rs = User::check_token($token) ;
-
-			if ( true === $rs ) {
+ 
+			if ( !is_array($rs) && $rs > 0 ) {
 				//called logout from model to update token = null
 				$row = User::logout($token) ;
 				//check rows affected is > 0 logout ok
@@ -253,14 +253,68 @@ class Controller_V1_User extends Controller_Rest {
 					array(
 				'meta' => array(
 					'code' => '1202' ,
-					'description' => 'Token is empty' ,
-					'messages' => 'Token invalid'
+					'description' => 'Token is null' ,
+					'messages' => 'Token empty'
 				) ,
 				'data' => null
 			));
 		}
 	}
 	
-	
+	/**
+	 * A function put_update to use update user info
+	 * @link http://localhost/v1/users/
+	 * method PUT
+	 * @access  public
+	 * @return  Response
+	 */
+	public function put_update() {
+		//check token valid to update
+		$data['token'] =Input::put('token') ;
+		
+		if ( !empty($data['token']) ) {
+			//check token exist
+			$id = User::check_token($data['token']) ;
+			if ( is_numeric($id) && $id > 0) {
+				//get data used update and validate
+				$data['id'] = $id ;
+				$data['lastname'] = Security::clean(Input::put('lastname'),$this->filters);
+				$data['firstname'] = Security::clean(Input::put('firstname'),$this->filters);
+				$data['email'] = Input::put('email') ;
+				$rs = User::validate_update($data) ;
+				//return error messgae if had error
+				if ( true !== $rs) {
+					//error 1001 for data invalid
+					return $this->response($rs) ;
+				} else {
+					//not have error, continue update
+					$rs = User::update_user($data) ;
+					return $this->response(
+					array(
+						'meta' => array(
+							'code' => '200' ,
+							'messages' => 'Update success' 
+						),
+						'data' => $rs
+					)) ;
+				}
+				
+			} else {
+				//response error message return if check token wrong
+				return $this->response($rs) ;
+			}
+		} else {
+			//return error empty token
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => '1202' ,
+									'description' => 'Token is null' ,
+									'messages' => 'Token empty'
+							) ,
+							'data' => null
+					));
+		}
+	}
 	 
 }

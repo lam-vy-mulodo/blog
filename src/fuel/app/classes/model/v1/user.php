@@ -78,6 +78,62 @@ class User extends Model {
 			return true;
 		}
 	}
+	/*
+	 * function use to validate lastname, firstname,email update user info
+	 * if don't have error,return true
+	 * else return array error message
+	 */
+	public static function validate_update($data) {
+		$input = array (
+				'firstname' => $data['firstname'],
+				'lastname' => $data['lastname'],
+				'email' => $data['email']
+		);
+		//check if Form validation created, use instance for retrieve it not use forge
+		$val = \Validation::active();
+		if ($val) {
+			$val = \Validation::forge();
+		} else {
+			$val = \Validation::instance();
+		}
+		//$val = Validation::forge();
+		
+		
+		$val->add_field ( 'email', 'Email address', 'required|valid_email' );
+		$val->add_field ( 'lastname', 'Last name', 'required' );
+		$val->add_field ( 'firstname', 'First name', 'required' );
+		
+		// set custom message for rules
+		$val->set_message ( 'required', 'Last name, first name and email must be required' );
+		$val->set_message ( 'valid_email', 'Email incorrect' );
+				
+		//print_r($data) ;
+		// create message array
+		$_error = array ();
+		if (! $val->run ($input)) {
+				
+			foreach ( $val->error () as $field => $error ) {
+				// add error message to array for return
+				$_error [] = array (
+						'message' => $error->get_message ()
+				);
+			}
+			//var_dump($_error);die;
+			// return error message
+			$code = '1001';
+			return array (
+					'meta' => array (
+							'code' => $code,
+							'description' => 'Input validation failed',
+							'message' => $_error
+					),
+					'data' => null
+			);
+		} else {
+			// return 1 for valid all data
+			return true;
+		}
+	}
 	
 	/*
 	 * the method use to check username exist in database or not return true for exist else return false
@@ -200,16 +256,20 @@ class User extends Model {
 			$row = DB::select()->from('user')->where('login_hash',$token)->execute() ;
 			
 			//check by count row affected 
-			if ($row->count() > 0 ) {
-				//return true token is exist, can logout
-				return true ;
+			if ( $row[0]['id'] > 0 ) {
+				
+				
+				//return id of user had this token
+				return $row[0]['id'];
+				
+				
 			} else {
 				//return code is 1205 for login faild, token isn't exist in db 
 				return array(
 					'meta' => array(
 						'code' => '1205' ,
-						'description' => 'Access is denied.' ,
-						'messages' => 'Logout failed '
+						'description' => 'Token is not exist in db.' ,
+						'messages' => 'Access is denied '
 				),
 					'data' => null
 				) ;
@@ -237,4 +297,64 @@ class User extends Model {
 		}
 	}
 	
+	/*
+	 * method to use get user info by token
+	 * input the token got after login
+	 * return data user info
+	 */
+	public static function get_user_by_id($id) {
+		try {
+			
+			$rs = DB::select('id','username','lastname','firstname','email','created_at','modified_at')->from('user')->where('id','=',$id)->execute() ;
+			if ($rs[0]['id'] > 0) {
+				
+				return $rs[0] ;
+			} else {
+				
+				//return error array
+				return array(
+						'meta' => array(
+								'code' => '2004' ,
+								'description' => 'User id not exist.' ,
+								'messages' => 'Get information of user failed'
+						),
+						'data' => null
+				) ;
+				
+			}
+			
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage() ;
+		}
+	}
+	
+	/*
+	 * public function
+	 * use to update user info
+	 * return user info after updated
+	 */
+	public static function update_user($data) {
+		try {
+			//call update
+			$query = DB::update('user')->set(
+					array(
+						'lastname' => $data['lastname'],
+						'firstname' => $data['firstname'],
+						'email' => $data['email'],
+						'modified_at' => time()
+					)	
+			)->where('id',$data['id'])->execute();
+			
+			//get data from token
+			//use compare before data
+			$data = self::get_user_by_id($data['id']) ;
+			return $data ;
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage() ;
+		}
+		
+		
+	}
 }
