@@ -17,7 +17,7 @@ class User extends Model {
 	
 	/*
 	 * method validation for check information input to database
-	 * input data  recieve from post method
+	 * @param input data  recieve from post method
 	 * @return array error of input data
 	 */
 	public static function validate_user($data) {
@@ -78,6 +78,63 @@ class User extends Model {
 			return true;
 		}
 	}
+	/*
+	 * function use to validate lastname, firstname,email update user info
+	 * @param data user info
+	 * @return if don't have error,return true, else return error
+	 * 
+	 */
+	public static function validate_update($data) {
+		$input = array (
+				'firstname' => $data['firstname'],
+				'lastname' => $data['lastname'],
+				'email' => $data['email']
+		);
+		//check if Form validation created, use instance for retrieve it not use forge
+		$val = \Validation::active();
+		if ($val) {
+			$val = \Validation::forge();
+		} else {
+			$val = \Validation::instance();
+		}
+		//$val = Validation::forge();
+		
+		
+		$val->add_field ( 'email', 'Email address', 'required|valid_email' );
+		$val->add_field ( 'lastname', 'Last name', 'required' );
+		$val->add_field ( 'firstname', 'First name', 'required' );
+		
+		// set custom message for rules
+		$val->set_message ( 'required', 'Last name, first name and email must be required' );
+		$val->set_message ( 'valid_email', 'Email incorrect' );
+				
+		//print_r($data) ;
+		// create message array
+		$_error = array ();
+		if (! $val->run ($input)) {
+				
+			foreach ( $val->error () as $field => $error ) {
+				// add error message to array for return
+				$_error [] = array (
+						'message' => $error->get_message ()
+				);
+			}
+			//var_dump($_error);die;
+			// return error message
+			$code = '1001';
+			return array (
+					'meta' => array (
+							'code' => $code,
+							'description' => 'Input validation failed',
+							'message' => $_error
+					),
+					'data' => null
+			);
+		} else {
+			// return 1 for valid all data
+			return true;
+		}
+	}
 	
 	/*
 	 * the method use to check username exist in database or not return true for exist else return false
@@ -106,7 +163,7 @@ class User extends Model {
 	/*
 	 * the method use to insert new account into user table return true for success else return error
 	 * @return new is of record inserted in db
-	 * data is user info recieved from post_register in controller
+	 * @param data is user info recieved from post_register in controller
 	 */
 	public static function create_user($data) {
 		// try catch for insert
@@ -148,7 +205,7 @@ class User extends Model {
 	}
 	/*
 	 * the method use to login
-	 * recieve param from Post method
+	 * @param username and password of user
 	 * @return array data of user info and token to success
 	 * return false for if not success
 	*/
@@ -166,7 +223,7 @@ class User extends Model {
 	
 	/*
 	 * method use to create token for user @use Auth package for create token token have format sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login)
-	 * return array data user info
+	 * @return array data user info
 	 * called after login or create user success.
 	 */
 	public static function create_token($username, $password) {
@@ -191,25 +248,29 @@ class User extends Model {
 	
 	/*
 	 * method use to check a token exist in db 
-	 * token recieve method PUT
-	 * if exist return true ; else return false;
+	 * @param token recieve method PUT
+	 * @return if exist return true ; else return false;
 	 */
 	public static function check_token($token) {
 		
 		try {
 			$row = DB::select()->from('user')->where('login_hash',$token)->execute() ;
 			
-			//check by count row affected 
-			if ($row->count() > 0 ) {
-				//return true token is exist, can logout
-				return true ;
+			//check if return the user id 
+			if ( $row[0]['id'] > 0 ) {
+				
+				
+				//return id of user had this token
+				return $row[0]['id'];
+				
+				
 			} else {
 				//return code is 1205 for login faild, token isn't exist in db 
 				return array(
 					'meta' => array(
 						'code' => '1205' ,
-						'description' => 'Access is denied.' ,
-						'messages' => 'Logout failed '
+						'description' => 'Token is not exist in db.' ,
+						'messages' => 'Access is denied '
 				),
 					'data' => null
 				) ;
@@ -221,9 +282,9 @@ class User extends Model {
 	}
 	/*
 	 * method to use is logout
-	 * input data is token
+	 * @param input data is token
 	 * update login_hash =null by token input
-	 * return row affected
+	 * @return row affected
 	 */
 	public static function logout($token) {
 		try {
@@ -237,4 +298,66 @@ class User extends Model {
 		}
 	}
 	
+	/*
+	 * method to use get user info by token
+	 * @param the token got after login
+	 * @return data user info
+	 */
+	public static function get_user_by_id($id) {
+		try {
+			//select user info by id
+			$rs = DB::select('id','username','lastname','firstname','email','created_at','modified_at')->from('user')->where('id','=',$id)->execute() ;
+			if ($rs[0]['id'] > 0) {
+				
+				return $rs[0] ;
+			} else {
+				
+				//return error array
+				return array(
+						'meta' => array(
+								'code' => '2004' ,
+								'description' => 'User id not exist.' ,
+								'messages' => 'Get information of user failed'
+						),
+						'data' => null
+				) ;
+				
+			}
+			
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage() ;
+		}
+	}
+	
+	/*
+	 * public function
+	 * use to update user info
+	 * @return user info after updated
+	 */
+	public static function update_user($data) {
+		try {
+			//call update
+			$query = DB::update('user')->set(
+					array(
+						'lastname' => $data['lastname'],
+						'firstname' => $data['firstname'],
+						'email' => $data['email'],
+						'modified_at' => time()
+					)	
+			)->where('id',$data['id'])->execute();
+			
+			//get data from user id
+			//use compare before data
+			$data = self::get_user_by_id($data['id']) ;
+			
+			return $data ;
+			
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage()) ;
+			return $ex->getMessage() ;
+		}
+		
+		
+	}
 }
