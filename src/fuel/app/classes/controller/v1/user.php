@@ -263,7 +263,7 @@ class Controller_V1_User extends Controller_Rest {
 	
 	/**
 	 * A function put_update to use update user info
-	 * @link http://localhost/v1/users/
+	 * @link http://localhost/v1/users/{user_id}
 	 * method PUT
 	 * @access  public
 	 * @return  Response

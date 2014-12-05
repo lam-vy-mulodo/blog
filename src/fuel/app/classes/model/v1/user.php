@@ -17,7 +17,7 @@ class User extends Model {
 	
 	/*
 	 * method validation for check information input to database
-	 * input data  recieve from post method
+	 * @param input data  recieve from post method
 	 * @return array error of input data
 	 */
 	public static function validate_user($data) {
@@ -80,8 +80,9 @@ class User extends Model {
 	}
 	/*
 	 * function use to validate lastname, firstname,email update user info
-	 * if don't have error,return true
-	 * else return array error message
+	 * @param data user info
+	 * @return if don't have error,return true, else return error
+	 * 
 	 */
 	public static function validate_update($data) {
 		$input = array (
@@ -162,7 +163,7 @@ class User extends Model {
 	/*
 	 * the method use to insert new account into user table return true for success else return error
 	 * @return new is of record inserted in db
-	 * data is user info recieved from post_register in controller
+	 * @param data is user info recieved from post_register in controller
 	 */
 	public static function create_user($data) {
 		// try catch for insert
@@ -204,7 +205,7 @@ class User extends Model {
 	}
 	/*
 	 * the method use to login
-	 * recieve param from Post method
+	 * @param username and password of user
 	 * @return array data of user info and token to success
 	 * return false for if not success
 	*/
@@ -222,7 +223,7 @@ class User extends Model {
 	
 	/*
 	 * method use to create token for user @use Auth package for create token token have format sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login)
-	 * return array data user info
+	 * @return array data user info
 	 * called after login or create user success.
 	 */
 	public static function create_token($username, $password) {
@@ -247,8 +248,8 @@ class User extends Model {
 	
 	/*
 	 * method use to check a token exist in db 
-	 * token recieve method PUT
-	 * if exist return true ; else return false;
+	 * @param token recieve method PUT
+	 * @return if exist return true ; else return false;
 	 */
 	public static function check_token($token) {
 		
@@ -281,9 +282,9 @@ class User extends Model {
 	}
 	/*
 	 * method to use is logout
-	 * input data is token
+	 * @param input data is token
 	 * update login_hash =null by token input
-	 * return row affected
+	 * @return row affected
 	 */
 	public static function logout($token) {
 		try {
@@ -299,8 +300,8 @@ class User extends Model {
 	
 	/*
 	 * method to use get user info by token
-	 * input the token got after login
-	 * return data user info
+	 * @param the token got after login
+	 * @return data user info
 	 */
 	public static function get_user_by_id($id) {
 		try {
@@ -332,7 +333,7 @@ class User extends Model {
 	/*
 	 * public function
 	 * use to update user info
-	 * return user info after updated
+	 * @return user info after updated
 	 */
 	public static function update_user($data) {
 		try {
