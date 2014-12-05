@@ -255,7 +255,7 @@ class User extends Model {
 		try {
 			$row = DB::select()->from('user')->where('login_hash',$token)->execute() ;
 			
-			//check by count row affected 
+			//check if return the user id 
 			if ( $row[0]['id'] > 0 ) {
 				
 				
@@ -304,7 +304,7 @@ class User extends Model {
 	 */
 	public static function get_user_by_id($id) {
 		try {
-			
+			//select user info by id
 			$rs = DB::select('id','username','lastname','firstname','email','created_at','modified_at')->from('user')->where('id','=',$id)->execute() ;
 			if ($rs[0]['id'] > 0) {
 				
@@ -346,10 +346,12 @@ class User extends Model {
 					)	
 			)->where('id',$data['id'])->execute();
 			
-			//get data from token
+			//get data from user id
 			//use compare before data
 			$data = self::get_user_by_id($data['id']) ;
+			
 			return $data ;
+			
 		} catch (\Exception $ex) {
 			Log::error($ex->getMessage()) ;
 			return $ex->getMessage() ;

@@ -274,13 +274,15 @@ class Controller_V1_User extends Controller_Rest {
 		
 		if ( !empty($data['token']) ) {
 			//check token exist
-			$id = User::check_token($data['token']) ;
-			if ( is_numeric($id) && $id > 0) {
+			$rs = User::check_token($data['token']) ;
+			//check return data is user id ?
+			if ( is_numeric($rs) && $rs > 0) {
 				//get data used update and validate
-				$data['id'] = $id ;
+				$data['id'] = $rs ;
 				$data['lastname'] = Security::clean(Input::put('lastname'),$this->filters);
 				$data['firstname'] = Security::clean(Input::put('firstname'),$this->filters);
-				$data['email'] = Input::put('email') ;
+				$data['email'] = Security::clean(Input::put('email'), $this->filters) ;
+								
 				$rs = User::validate_update($data) ;
 				//return error messgae if had error
 				if ( true !== $rs) {
