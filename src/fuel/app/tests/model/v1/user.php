@@ -33,6 +33,7 @@ class Test_Model_V1_User extends TestCase {
 	public function tearDown() {
 		
 		unset($this->_user);
+		
 	}
 	
 	/**
@@ -125,7 +126,7 @@ class Test_Model_V1_User extends TestCase {
     	);    	   	
     	
     	$result = $this->_user->create_token($data['username'], $data['password']) ;
-    	
+    	//print_r($result) ; die;
     	//compare expected data with result data 
     	$this->assertEquals($data['id'],$result['id']);
     	$this->assertEquals($data['username'],$result['username']);
@@ -325,8 +326,9 @@ class Test_Model_V1_User extends TestCase {
     	$token = $data['token'] ;
     	
     	$result = User::check_token($token ) ;
-    	//compare result return with true - token exist
-    	$this->assertTrue($result) ;
+    	//compare result return with id of username vy (30)- token exist
+    	
+    	$this->assertEquals(30, $result) ;
     	
     	
     }
@@ -359,7 +361,7 @@ class Test_Model_V1_User extends TestCase {
     }
     /**
      * function use to test logout ok
-     * input is token was create from login function
+     * @param input is token was create from login function
      * compare number rows affected greate than 0
      * @group logout
      */
@@ -380,4 +382,164 @@ class Test_Model_V1_User extends TestCase {
     	//compare status with error code 1205
     	$this->assertEquals('1205', $result['meta']['code']) ;
     }
+    
+    
+    /**
+     * function use test validate update user
+     * compare error code 1001
+     * @group validate_update_notok
+     * @dataProvider update_provider
+     */
+    public function test_validate_update_notok($test_data) {
+    	//
+    	//$User = $this->_user;
+    	$val = $this->_user->validate_update($test_data);
+    	//compare with error code 1001 when have data invalid    	
+    	
+    	$this->assertEquals(1001,$val['meta']['code']);
+    	
+    }
+       
+    
+    /**
+     * Define test data set
+     *
+     * @return array Test data
+     */
+    public function update_provider() {
+    	$test_data = array();
+    	// Null firstname
+    	$test_data[][] = array(
+    			'firstname' => '',
+    			'lastname' => 'Lam',
+    			'email' => 'lam.vy@mulodo.com'
+    	);
+    	//null lastname
+    	$test_data[][] = array(
+    			'firstname' => 'thuyvy',
+    			'lastname' => '',
+    			'email' => 'lam.vy@mulodo.com'
+    	);
+    	//email incorrect
+    	$test_data[][] = array(
+    			'firstname' => 'Thuy vy',
+    			'lastname' => 'Lam',
+    			'email' => 'lam.vy.mulodo.com'
+    	);
+    	return $test_data ;
+    }
+    /**
+     * function use test validate update user
+     * compare with true
+     * @group validate_update_ok
+     */
+    public function test_validate_update_ok() {
+    	//create data valid to test
+    	$test_data = array();
+    	$test_data = array(
+    			'lastname' => 'Lam',
+    			'firstname' => 'thuy vy',
+    			'email' => 'lam.vy@mulodo.com'
+    	) ;
+    
+    	//$User = $this->_user;
+    	$val =User::validate_update($test_data);    
+    	//compare with true when have data valid    	
+    	$this->assertTrue($val);
+    
+    }
+    
+    /**
+     * function use test get user info by id 
+     * @group get_user_ok
+     */
+    public function test_get_userinfo_ok() {
+    	//expected data use to compare
+    	$user = array (
+    		'id' => '88',
+    		'username' => 'kenny3',
+    		'firstname' => 'vy',
+    		'lastname' => 'lam' ,
+    		'email' => 'lam.vy@gmail.com' ,
+    		'created_at' => '1417675134',
+    		'modified_at' => '1417675134'
+    	);
+    	//call get user info by id =30
+    	$data = $this->_user->get_user_by_id(88) ;
+    	$this->assertEquals($user['id'] , $data['id']) ;
+    	$this->assertEquals($user['username'] , $data['username']) ;
+    	$this->assertEquals($user['lastname'] , $data['lastname']) ;
+    	$this->assertEquals($user['firstname'] , $data['firstname']) ;
+    	$this->assertEquals($user['email'] , $data['email']) ;
+    	$this->assertEquals($user['created_at'] , $data['created_at']) ;
+    	$this->assertEquals($user['modified_at'] , $data['modified_at']) ;
+    	
+    }
+    
+    /**
+     * function use test get user info by id but not ok
+     * compare with error 2004
+     * @group get_user_notok
+     */
+    public function test_get_userinfo_notok() { 
+    	//id  = 1 not exist in db
+    	$data = $this->_user->get_user_by_id(1) ;
+    	//compare with error code 2004
+    	//print_r($data) ;
+    	$this->assertEquals(2004 , $data['meta']['code']) ;
+    }
+    /**
+     * function use test update user info by id
+     * compare with expected after update info
+     * @group update_user
+     */
+    public function test_update() {
+    	//expected data use to compare
+    	//lastname, firstname, email use to update when function update_user called
+    	$user = array (
+    			'id' => '88',
+    			'username' => 'kenny3',
+    			'firstname' => 'vy2',
+    			'lastname' => 'lam2' ,
+    			'email' => 'lam.vy2@mulodo.com'
+    			
+    	);
+    	//call update user info by id = 88
+    	$data = $this->_user->update_user($user) ;
+    	$this->assertEquals($user['id'] , $data['id']) ;
+    	$this->assertEquals($user['username'] , $data['username']) ;
+    	$this->assertEquals($user['lastname'] , $data['lastname']) ;
+    	$this->assertEquals($user['firstname'] , $data['firstname']) ;
+    	$this->assertEquals($user['email'] , $data['email']) ;
+    	//call update user info return old data
+    	//use run test get user info
+    	$this->reset_data_update() ;
+    }
+    
+    /**
+     * function used reset data after call update
+     */
+    public function reset_data_update() {
+    	//data reset
+    	$user = array (
+    			'id' => '88',
+    			'firstname' => 'vy',
+    			'lastname' => 'lam' ,
+    			'email' => 'lam.vy@gmail.com',
+    			'modified_at' => '1417675134'
+    
+    	);
+    	//call get user info by id =30
+    	$query = DB::update('user')->set(
+    		array(
+    			'firstname' => $user['firstname'] ,
+    			'lastname' => $user['lastname'] ,
+    			'email' => $user['email'] ,
+    			'modified_at' => $user['modified_at']
+    		)
+    	)->where('id',$user['id'])->execute();
+    	
+    	
+    }
+    
 }
