@@ -130,7 +130,8 @@ class Test_Controller_V1_User extends TestCase {
 		//compare rs code for 1204
 		//print_r($rs) ;
 		$this->assertEquals($rs['meta']['code'], '200') ;
-	
+		//return token to use update user info function
+		return $rs['data'];
 	}
 	/**
 	 * used check login not ok, compare code 1203
@@ -393,7 +394,7 @@ class Test_Controller_V1_User extends TestCase {
 	public function test_logout() {
 		//first is login
 		//login first for test
-		$data['username'] = 'thuyvy' ;
+		$data['username'] = 'kenny4' ;
 		$data['password'] = '12345' ;
 	
 		//call curl for login
@@ -408,5 +409,121 @@ class Test_Controller_V1_User extends TestCase {
 		//compare with code 200
 		$this->assertEquals('200', $rs['meta']['code']) ;
 		
+	}
+	/**
+	 * use test update user info function ok 
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/{user_id}
+	 * compare with code error 200
+	 * @group update_user2
+	 * @depends test_login_ok
+	 */
+	public function test_put_update($data) {
+		/*
+		//first is login
+		//login first for test
+		$data['username'] = 'kenny3' ;
+		$data['password'] = '12345' ;
+		
+		//call curl for login
+		$method = 'POST' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
+		$rs = $this->init_curl($data, $method, $link) ;
+		*/
+		//get token return from login
+		$token = $data['token'] ;//$rs['data']['token'] ;
+		
+		$user = array (
+				'token' => $token ,
+				'firstname' => 'vy2',
+				'lastname' => 'lam2' ,
+				'email' => 'lam.vy2@mulodo.com'
+    
+		);
+		$method = 'PUT' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
+		$result = $this->init_curl($user, $method, $link) ;
+		
+		//compare
+		$this->assertEquals('200', $result['meta']['code']) ;
+		//reset dataupdate
+		$this->reset_data_update() ;
+	}
+	/**
+	 * use test update user info function not ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/{user_id}
+	 * compare with code error 1001 for invalid data input
+	 * @group update_user3
+	 * @dataProvider update_provider
+	 */
+	public function test_validate_update($test_data) {
+		
+		$method = 'PUT' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
+		$result = $this->init_curl($test_data, $method, $link) ;
+		print_r($result) ;
+		//compare
+		$this->assertEquals('1001', $result['meta']['code']) ;
+	}
+	/**
+	 * Define test data set
+	 *
+	 * @return array Test data
+	 */
+	public function update_provider() {
+		
+		$test_data = array();
+		// Null firstname
+		$test_data[][] = array(
+				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
+				'firstname' => '',
+				'lastname' => 'Lam',
+				'email' => 'lam.vy@mulodo.com'
+		);
+		
+		//null lastname
+		$test_data[][] = array(
+				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
+				'firstname' => 'thuyvy',
+				'lastname' => '',
+				'email' => 'lam.vy@mulodo.com'
+		);
+		//email incorrect
+		$test_data[][] = array(
+				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
+				'firstname' => 'Thuy vy',
+				'lastname' => 'Lam',
+				'email' => 'lam.vy.mulodo.com'
+		);
+		
+		return $test_data ;
+	}
+	/**
+	 * function used reset data after call update
+	 */
+	public function reset_data_update() {
+		//data reset
+		$user = array (
+				'token' => '',
+				'id' => '30',
+				'firstname' => 'vy',
+				'lastname' => 'lam' ,
+				'email' => 'lam.vy@mulodo.com',
+				'modified_at' => '1416983742'
+	
+		);
+		//call get user info by id =30
+		$query = DB::update('user')->set(
+				array(
+						'firstname' => $user['firstname'] ,
+						'lastname' => $user['lastname'] ,
+						'email' => $user['email'] ,
+						'modified_at' => $user['modified_at'],
+						'login_hash' => $user['token']
+				)
+		)->where('id',$user['id'])->execute();
+		 
+		 
 	}
 }
