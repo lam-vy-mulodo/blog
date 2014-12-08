@@ -403,6 +403,7 @@ class Test_Model_V1_User extends TestCase {
     	//compare status with error code 1205
     	$this->assertEquals('1205', $result['meta']['code']) ;
     }
+
     
     
     /**
@@ -564,4 +565,27 @@ class Test_Model_V1_User extends TestCase {
     	
     }
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+* This comment is used for making conflict situation. This should be removed when you merged and resolved completely. 
+*
+*/
+
+
 }
