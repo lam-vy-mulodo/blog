@@ -101,7 +101,28 @@ class Test_Model_V1_User extends TestCase {
     	$user_id = $this->_user->create_user($data) ;    	
     	    	
     	$this->assertGreaterThan(0,$user_id);
-    	
+    	//delete user have been created to test username is not exist in db
+    	//user data can insert when username not exist
+    	self::remove_user($user_id) ;
+    }
+    
+    /**
+     * reset username - it will not exist to test create
+     * remove user account have been created when call test create user
+     */
+    
+    public static function remove_user($user_id) {
+    
+    	// try catch to execute query db
+    	try {
+    		$query = DB::delete('user')->where('id' ,' = ' ,$user_id)->execute();
+    			
+    		return ( $query == 1) ? true : false ;
+    	} catch ( Exception $ex ) {
+    
+    		Log::error ( $ex->getMessage () );
+    		return $ex->getMessage ();
+    	}
     }
     
     /**
@@ -395,7 +416,7 @@ class Test_Model_V1_User extends TestCase {
     	//$User = $this->_user;
     	$val = $this->_user->validate_update($test_data);
     	//compare with error code 1001 when have data invalid    	
-    	
+    	//print_r($val) ;
     	$this->assertEquals(1001,$val['meta']['code']);
     	
     }
@@ -439,7 +460,8 @@ class Test_Model_V1_User extends TestCase {
     	$test_data = array(
     			'lastname' => 'Lam',
     			'firstname' => 'thuy vy',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
+    			
     	) ;
     
     	//$User = $this->_user;
@@ -493,7 +515,7 @@ class Test_Model_V1_User extends TestCase {
      * compare with expected after update info
      * @group update_user
      */
-    public function test_update() {
+    public function test_put_update() {
     	//expected data use to compare
     	//lastname, firstname, email use to update when function update_user called
     	$user = array (
@@ -529,7 +551,7 @@ class Test_Model_V1_User extends TestCase {
     			'modified_at' => '1417675134'
     
     	);
-    	//call get user info by id =30
+    	//update reset user info id 88
     	$query = DB::update('user')->set(
     		array(
     			'firstname' => $user['firstname'] ,

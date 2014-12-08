@@ -130,7 +130,8 @@ class Test_Controller_V1_User extends TestCase {
 		//compare rs code for 1204
 		//print_r($rs) ;
 		$this->assertEquals($rs['meta']['code'], '200') ;
-	
+		//return token to use update user info function
+		return $rs['data'];
 	}
 	/**
 	 * used check login not ok, compare code 1203
@@ -393,7 +394,7 @@ class Test_Controller_V1_User extends TestCase {
 	public function test_logout() {
 		//first is login
 		//login first for test
-		$data['username'] = 'thuyvy' ;
+		$data['username'] = 'kenny4' ;
 		$data['password'] = '12345' ;
 	
 		//call curl for login
@@ -415,8 +416,10 @@ class Test_Controller_V1_User extends TestCase {
 	 * link http://localhost/_blog/blog/src/v1/users/{user_id}
 	 * compare with code error 200
 	 * @group update_user2
+	 * @depends test_login_ok
 	 */
-	public function test_update() {
+	public function test_put_update($data) {
+		/*
 		//first is login
 		//login first for test
 		$data['username'] = 'kenny3' ;
@@ -426,8 +429,9 @@ class Test_Controller_V1_User extends TestCase {
 		$method = 'POST' ;
 		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
 		$rs = $this->init_curl($data, $method, $link) ;
+		*/
 		//get token return from login
-		$token = $rs['data']['token'] ;
+		$token = $data['token'] ;//$rs['data']['token'] ;
 		
 		$user = array (
 				'token' => $token ,
@@ -501,12 +505,12 @@ class Test_Controller_V1_User extends TestCase {
 	public function reset_data_update() {
 		//data reset
 		$user = array (
-				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f',
-				'id' => '88',
+				'token' => '',
+				'id' => '30',
 				'firstname' => 'vy',
 				'lastname' => 'lam' ,
-				'email' => 'lam.vy@gmail.com',
-				'modified_at' => '1417675134'
+				'email' => 'lam.vy@mulodo.com',
+				'modified_at' => '1416983742'
 	
 		);
 		//call get user info by id =30
