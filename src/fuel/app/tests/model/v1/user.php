@@ -594,6 +594,7 @@ class Test_Model_V1_User extends TestCase {
     	$this->assertEquals($user['created_at'], $data['data']['created_at']);
     	$this->assertEquals($user['modified_at'], $data['data']['modified_at']);
     }
+    
     /**
      * function use test get user info by id
      * the id not exist in db
@@ -607,7 +608,7 @@ class Test_Model_V1_User extends TestCase {
     	//the user id not exist in db
     	$result = $this->_user->get_user_info($id);
     	//compare with false
-    	
+    	//failure 1 for id 30 b/c it exist in db.
     	$this->assertFalse($result);
     }
     
@@ -618,11 +619,11 @@ class Test_Model_V1_User extends TestCase {
      */
     public function id_provider() {
     	$test_data = array();
-    	//create data from 0-10 - id is not exist in db except 30
+    	//create data from 0-10 - id is not exist in db except id 30
     	for ($i = 0; $i < 40; $i++) {
     		$test_data[][] = $i;
     	}
-    	//return test data
+    	//return array test data provider
     	return $test_data;
     	
     }

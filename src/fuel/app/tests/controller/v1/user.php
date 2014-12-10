@@ -39,10 +39,10 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	public function test_validate_user($test_data) {
 		
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
 		// called function init_curl to execute request
-		$res = $this->init_curl($test_data, $method, $link) ;
+		$res = $this->init_curl($test_data, $method, $link);
 		// Compare result
 		$this->assertEquals(1001, $res['meta']['code']);
 		
@@ -65,11 +65,11 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
-		$res =  $this->init_curl($test_data, $method, $link) ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$res =  $this->init_curl($test_data, $method, $link);
 		
 		$this->assertEquals(2001, $res['meta']['code']);
 	}
@@ -90,12 +90,12 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
 		
-		$res =  $this->init_curl($test_data, $method, $link) ;
+		$res =  $this->init_curl($test_data, $method, $link);
 	    
 		$this->assertEquals(200, $res['meta']['code']);
 		//compare expected data with result data
@@ -104,11 +104,11 @@ class Test_Controller_V1_User extends TestCase {
 		$this->assertEquals($test_data['email'], $res['data']['email']);
 		$this->assertEquals($test_data['lastname'], $res['data']['lastname']);
 		$this->assertEquals($test_data['firstname'], $res['data']['firstname']);		
-		$this->assertEquals(40, strlen($res['data']['token'])) ;
+		$this->assertEquals(40, strlen($res['data']['token']));
 				
 		//delete user have been created to test username is not exist in db
 		//user data can insert when username not exist
-		self::remove_user($res['data']['id']) ;
+		self::remove_user($res['data']['id']);
 	}
 	
 	/**
@@ -120,16 +120,16 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	public function test_login_ok() {
 		//login first for test
-		$data['username'] = 'thuyvy' ;
-		$data['password'] = '12345' ;
+		$data['username'] = 'thuyvy';
+		$data['password'] = '12345';
 	
 		//call curl for login
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
-		$rs = $this->init_curl($data, $method, $link) ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/login';
+		$rs = $this->init_curl($data, $method, $link);
 		//compare rs code for 1204
-		//print_r($rs) ;
-		$this->assertEquals($rs['meta']['code'], '200') ;
+		//print_r($rs);
+		$this->assertEquals($rs['meta']['code'], '200');
 		//return token to use update user info function
 		return $rs['data'];
 	}
@@ -143,13 +143,13 @@ class Test_Controller_V1_User extends TestCase {
 			
 		
 		//call curl for login
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
-		$rs = $this->init_curl($test_data, $method, $link) ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/login';
+		$rs = $this->init_curl($test_data, $method, $link);
 	
 		//compare rs code for 1204
-		//print_r($rs) ; die ;
-		$this->assertEquals($rs['meta']['code'], '1203') ;
+		//print_r($rs); die;
+		$this->assertEquals($rs['meta']['code'], '1203');
 		
 	}
 	
@@ -161,7 +161,7 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	
 	public function login_not_provider() {
-		$test_data = array() ;
+		$test_data = array();
 		//username not exist
 		$test_data[][] = array(
 				'username' => 'thuyvy88',
@@ -177,7 +177,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '1234'
 		);
 	
-		return $test_data ;
+		return $test_data;
 	}
 	
     /**
@@ -186,7 +186,7 @@ class Test_Controller_V1_User extends TestCase {
      * get result from response
      * 
      */
-    public function init_curl($test_data,$method,$link) {
+    public function init_curl($test_data, $method, $link) {
     	
     	
     	// create a Request_Curl object
@@ -204,8 +204,8 @@ class Test_Controller_V1_User extends TestCase {
     	// Get response body
     	$res = json_decode($result->body(), true);
     	// return response
-    	//print_r($test_data) ; die ;
-    	return $res ;
+    	//print_r($test_data); die;
+    	return $res;
     }
     
     /**
@@ -217,13 +217,13 @@ class Test_Controller_V1_User extends TestCase {
 		
 		// try catch to execute query db
 		try {
-			$query = DB::delete('user')->where('id' ,' = ' ,$user_id)->execute();
+			$query = DB::delete('user')->where('id', ' = ', $user_id)->execute();
 			
-			return ( $query == 1) ? true : false ;
-		} catch ( Exception $ex ) {
+			return ($query == 1) ? true : false;
+		} catch (Exception $ex) {
 				
-			Log::error ( $ex->getMessage () );
-			return $ex->getMessage ();
+			Log::error($ex->getMessage());
+			return $ex->getMessage();
 		}
 	}
 	/**
@@ -238,7 +238,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		//Null password
 		$test_data[][] = array(
@@ -246,7 +246,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		// Null email
 		$test_data[][] = array(
@@ -254,7 +254,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => ''
+				'email' => '',
 		);
 		// Null  lastname
 		$test_data[][] = array(
@@ -262,7 +262,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => '',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		// Null firstname
 		$test_data[][] = array(
@@ -270,7 +270,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => '',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		//username contain at least 5 characters
 		$test_data[][] = array(
@@ -278,7 +278,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		//password contain at least 5 characters
 		$test_data[][] = array(
@@ -286,7 +286,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '123',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		//username contain special characters
 		$test_data[][] = array(
@@ -294,7 +294,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		//password contain special characters
 		$test_data[][] = array(
@@ -302,7 +302,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345#$@%',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		//username contain more 50 characters
 		$test_data[][] = array(
@@ -310,7 +310,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		//username contain more 50 characters
 		$test_data[][] = array(
@@ -318,7 +318,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345hggsirge345iywyiuhqihejqwb2556621jdhusfhiuiyuqwueg742394676769y98i',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		//email not correct format
 		$test_data[][] = array(
@@ -326,7 +326,7 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => '12345',
 				'firstname' => 'vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		return $test_data;
 	}
@@ -340,13 +340,13 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	public function test_token_empty() {
 		//data
-		$test_data['token'] = '' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;
-		$method = 'PUT' ;
-		$rs = $this->init_curl($test_data, $method, $link) ;
+		$test_data['token'] = '';
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout';
+		$method = 'PUT';
+		$rs = $this->init_curl($test_data, $method, $link);
 		//compare with error code 1202
 		
-		$this->assertEquals('1202' ,$rs['meta']['code']) ;
+		$this->assertEquals('1202' ,$rs['meta']['code']);
 		
 	}
 	/**
@@ -360,13 +360,13 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	public function test_token_invalid($test_data) {
 		
-		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;		
-		$method = 'PUT' ;
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout';		
+		$method = 'PUT';
 		//call curl request
-		$rs = $this->init_curl($test_data, $method, $link) ;
+		$rs = $this->init_curl($test_data, $method, $link);
 		//compare with error code
 		
-		$this->assertEquals('1205',$rs['meta']['code']) ;
+		$this->assertEquals('1205', $rs['meta']['code']);
 	}
 	/**
 	 * Define test data set
@@ -376,11 +376,11 @@ class Test_Controller_V1_User extends TestCase {
 	public function token_provider() {
 		$test_data = array();
 		//loop for auto create
-		for ($i = 0 ; $i < 10 ; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$test_data[][] = array('token' => sha1(time()));
 		}
 		 
-		return $test_data ;
+		return $test_data;
 	}
 	
 	/**
@@ -394,20 +394,20 @@ class Test_Controller_V1_User extends TestCase {
 	public function test_logout() {
 		//first is login
 		//login first for test
-		$data['username'] = 'kenny4' ;
-		$data['password'] = '12345' ;
+		$data['username'] = 'kenny4';
+		$data['password'] = '12345';
 	
 		//call curl for login
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
-		$rs = $this->init_curl($data, $method, $link) ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/login';
+		$rs = $this->init_curl($data, $method, $link);
 		//get token return from login
-		$test_data['token'] = $rs['data']['token'] ;
-		$method = 'PUT' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/logout' ;
-		$rs = $this->init_curl($test_data, $method, $link) ;
+		$test_data['token'] = $rs['data']['token'];
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/users/logout';
+		$rs = $this->init_curl($test_data, $method, $link);
 		//compare with code 200
-		$this->assertEquals('200', $rs['meta']['code']) ;
+		$this->assertEquals('200', $rs['meta']['code']);
 		
 	}
 	/**
@@ -422,32 +422,32 @@ class Test_Controller_V1_User extends TestCase {
 		/*
 		//first is login
 		//login first for test
-		$data['username'] = 'kenny3' ;
-		$data['password'] = '12345' ;
+		$data['username'] = 'kenny3';
+		$data['password'] = '12345';
 		
 		//call curl for login
-		$method = 'POST' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/login' ;
-		$rs = $this->init_curl($data, $method, $link) ;
+		$method = 'POST';
+		$link = 'http://localhost/_blog/blog/src/v1/users/login';
+		$rs = $this->init_curl($data, $method, $link);
 		*/
 		//get token return from login
-		$token = $data['token'] ;//$rs['data']['token'] ;
+		$token = $data['token'];//$rs['data']['token'];
 		
 		$user = array (
 				'token' => $token ,
 				'firstname' => 'vy2',
 				'lastname' => 'lam2' ,
-				'email' => 'lam.vy2@mulodo.com'
+				'email' => 'lam.vy2@mulodo.com',
     
 		);
-		$method = 'PUT' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
-		$result = $this->init_curl($user, $method, $link) ;
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$result = $this->init_curl($user, $method, $link);
 		
 		//compare
-		$this->assertEquals('200', $result['meta']['code']) ;
+		$this->assertEquals('200', $result['meta']['code']);
 		//reset dataupdate
-		$this->reset_data_update() ;
+		$this->reset_data_update();
 	}
 	/**
 	 * use test update user info function not ok
@@ -459,12 +459,12 @@ class Test_Controller_V1_User extends TestCase {
 	 */
 	public function test_validate_update($test_data) {
 		
-		$method = 'PUT' ;
-		$link = 'http://localhost/_blog/blog/src/v1/users/' ;
-		$result = $this->init_curl($test_data, $method, $link) ;
-		print_r($result) ;
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$result = $this->init_curl($test_data, $method, $link);
+		print_r($result);
 		//compare
-		$this->assertEquals('1001', $result['meta']['code']) ;
+		$this->assertEquals('1001', $result['meta']['code']);
 	}
 	/**
 	 * Define test data set
@@ -479,7 +479,7 @@ class Test_Controller_V1_User extends TestCase {
 				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
 				'firstname' => '',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		
 		//null lastname
@@ -487,43 +487,110 @@ class Test_Controller_V1_User extends TestCase {
 				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
 				'firstname' => 'thuyvy',
 				'lastname' => '',
-				'email' => 'lam.vy@mulodo.com'
+				'email' => 'lam.vy@mulodo.com',
 		);
 		//email incorrect
 		$test_data[][] = array(
 				'token' => '3d447f7b28cebe841c3f837213e1d7db5a10de8f' ,
 				'firstname' => 'Thuy vy',
 				'lastname' => 'Lam',
-				'email' => 'lam.vy.mulodo.com'
+				'email' => 'lam.vy.mulodo.com',
 		);
 		
-		return $test_data ;
+		return $test_data;
 	}
 	/**
 	 * function used reset data after call update
 	 */
 	public function reset_data_update() {
 		//data reset
-		$user = array (
+		$user = array(
 				'token' => '',
 				'id' => '30',
 				'firstname' => 'vy',
 				'lastname' => 'lam' ,
 				'email' => 'lam.vy@mulodo.com',
-				'modified_at' => '1416983742'
+				'modified_at' => '1416983742',
 	
 		);
 		//call get user info by id =30
 		$query = DB::update('user')->set(
-				array(
+				    array(
 						'firstname' => $user['firstname'] ,
 						'lastname' => $user['lastname'] ,
 						'email' => $user['email'] ,
 						'modified_at' => $user['modified_at'],
-						'login_hash' => $user['token']
-				)
-		)->where('id',$user['id'])->execute();
+						'login_hash' => $user['token'],
+				    ))->where('id', $user['id'])->execute();
 		 
+		 
+	}
+	/**
+	 * use test get user info function ok
+	 * method GET
+	 * link http://localhost/_blog/blog/src/v1/users/{user_id}
+	 * compare with code 200 and data user for success
+	 * @group get_info_ok
+	 */
+	public function test_get_info_ok() {
+		//expected data use to compare
+		$user = array (
+				'id' => '88',
+				'username' => 'kenny3',
+				'firstname' => 'vy',
+				'lastname' => 'lam' ,
+				'email' => 'lam.vy@gmail.com',
+				'created_at' => '1417675134',
+				'modified_at' => '1417675134',
+		);
+		//call get user info by id =88
+		$test_data['id'] = 88;
+		//set method and link
+		$method = 'GET';		
+		$link = 'http://localhost/_blog/blog/src/v1/users/88';
+		//call curl
+		$data = $this->init_curl($test_data, $method, $link);
+		//compare
+		$this->assertEquals('200', $data['meta']['code']);
+		$this->assertEquals($user['id'], $data['data']['id']);
+		$this->assertEquals($user['username'], $data['data']['username']);
+		$this->assertEquals($user['lastname'], $data['data']['lastname']);
+		$this->assertEquals($user['firstname'], $data['data']['firstname']);
+		$this->assertEquals($user['email'], $data['data']['email']);
+		$this->assertEquals($user['created_at'], $data['data']['created_at']);
+		$this->assertEquals($user['modified_at'], $data['data']['modified_at']);
+	}
+	
+	/**
+	 * use test get user info function not ok
+	 * method GET
+	 * link http://localhost/_blog/blog/src/v1/users/{user_id}
+	 * compare with code 2004 for user is not exist
+	 * @group get_info_notok2
+	 * @dataProvider id_provider
+	 */
+	public function test_get_info_notok($test_data) {
+		//set method and link
+		$method = 'GET';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/'.$test_data['id'];
+		$result = $this->init_curl(null, $method, $link);
+		//compare with error code 2004 , failure 1 for code 200 b/c id 30 exist in db
+		$this->assertEquals('2004', $result['meta']['code']);
+	}
+	/**
+	 * Define test data set
+	 *
+	 * @return array Test data
+	 */
+	public function id_provider() {
+		$test_data = array();
+		//create data from 0-10 - id is not exist in db except id 30
+		for ($i = 0; $i < 40; $i++) {
+			$test_data[][] = array('id' => $i);
+		}
+		//return test data provider
+		return $test_data;
 		 
 	}
 }
