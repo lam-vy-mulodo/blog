@@ -399,7 +399,7 @@ class User extends \ORM\Model {
 						'code' => SUSSCESS_CODE,
 						'messages' => 'Get user information success !'
 					),
-					'data' => $entry[$id]);
+					'data' => $entry[$id]->_data);
 			} else {
 				//return error array if user not exist
 				return false;
