@@ -45,25 +45,25 @@ class Controller_V1_User extends Controller_Rest {
 		
 		
 		//username use to login the system
-		$data['username'] = Security::clean(Input::post('username'),$this->filters);
+		$data['username'] = Security::clean(Input::post('username'), $this->filters);
 		//email use to login the system
-		$data['email'] = Security::clean(Input::post('email'),$this->filters);
+		$data['email'] = Security::clean(Input::post('email'), $this->filters);
 		//password use to login, will be encrypted
-		$data['password'] = Security::clean(Input::post('password'),$this->filters);
+		$data['password'] = Security::clean(Input::post('password'), $this->filters);
 		
 		//information of user
-		$data['lastname'] = Security::clean(Input::post('lastname'),$this->filters);
-		$data['firstname'] = Security::clean(Input::post('firstname'),$this->filters);
+		$data['lastname'] = Security::clean(Input::post('lastname'), $this->filters);
+		$data['firstname'] = Security::clean(Input::post('firstname'), $this->filters);
 		
 		//validation data user		
 		$result = User::validate_user($data);
 		//var_dump($val);die;
 		//have error message
-		if ( $result !== true ) {
+		if ($result !== true) {
 			
 			//response the error code and message;
 			//the code is 1001
-			return $this->response( $result );
+			return $this->response($result);
 		
 		} else {
 			//return 1 for valid data
@@ -71,24 +71,26 @@ class Controller_V1_User extends Controller_Rest {
 			//try catch to check and insert user into db
 			try	{
 				//check username exist or not return true if exist, else return false
-				$status = User::check_user_exist( $data['username'] );	
+				$status = User::check_user_exist($data['username']);	
 				//return $this->response(array($status));
 								
-				if ( $status ) {
+				if ($status) {
 					
 					//return error code and message
-					$code = '2001';
-					return $this->response( array(
+					
+					return $this->response(array(
 					        'meta' => array(
-							'code' => $code,
-							'description' => 'Username exist in database',
-							'message' => 'This username is already in used'),
-							'data' => null)
+								'code' => USER_EXIST_CODE,
+								'description' => USER_EXIST_DES,
+								'message' => USER_EXIST_MESS,
+					        ),
+							'data' => null,
+					        )
 					);
 				} else {
 					//start transaction
 					//user create in db and create token ok
-					DB::start_transaction() ;
+					DB::start_transaction();
 					//insert db
 					//set date time for create account and modified by current date time
 					$time = time();
@@ -107,34 +109,33 @@ class Controller_V1_User extends Controller_Rest {
 					 * return data array contain information of user created 
 					 */
 					
-					$user = User::create_token($data['username'], Security::clean(Input::post('password'),$this->filters)); 
+					$user = User::create_token($data['username'], Security::clean(Input::post('password'), $this->filters)); 
 					//commit transaction after insert and create token ok
 					DB::commit_transaction();
 					//add remember me cookie for check logged in
 					Auth::remember_me();
-					//response code 200 for success
-					$code = '200';
-					
-					return $this->response( array(
+					//response code SUSSCESS_CODE for success
+										
+					return $this->response(array(
 					    'meta' => array(
-						'code' => $code,
-						 'message' => 'Account created success',
-					),
-					'data' => $user,
-					));
+								'code' => SUSSCESS_CODE,
+						 		'message' => 'Account created success',
+						),
+						'data' => $user,
+						));
 					
 					
 					} else {
 						//rollback if faild
 						DB::rollback_transaction();
-						
-						$code = '9005';
-						return $this->response( array(
+												
+						return $this->response(array(
 						        'meta' => array(
-								'code' => $code,
-								'description' => 'can\'t insert into database',
-								'message' => $status,
-						        'data' => null)));
+								    'code' => SYSTEM_ERROR,
+								    'description' => 'can\'t insert into database',
+								    'message' => $status,
+						        'data' => null,
+						        )));
 					}
 				}
 				
@@ -165,42 +166,41 @@ class Controller_V1_User extends Controller_Rest {
 			return $this->response(
 				array(
 					'meta' => array(
-						'code' => '1204',
-						'description' => 'You login more 1 times' ,
-						'messages' => 'You had logged'		
+						'code' => USER_LOGGED_CODE,
+						'description' => USER_LOGGED_DES,
+						'messages' => USER_LOGGED_MESS,	
 					),
-					'data' => null
+					'data' => null,
 				)		        	
 			);
 			
 		} else {
 			//set up data to login
-			$username = Security::clean(Input::post('username'),$this->filters);
-			$password = Security::clean(Input::post('password'),$this->filters);
-			$rs =  User::login($username,$password) ;
+			$username = Security::clean(Input::post('username'), $this->filters);
+			$password = Security::clean(Input::post('password'), $this->filters);
+			$rs = User::login($username, $password);
 			
-			if ( false != $rs) {
+			if (false != $rs) {
 				
-				//return code 200 and message
-				return $this->response( array(
+				//return code SUSSCESS_CODE and message
+				return $this->response(array(
 						'meta' => array(
-							'code' => '200',
-							'messages' => 'Login success !'
+							'code' => SUSSCESS_CODE,
+							'messages' => 'Login success !',
 						),
-						'data' => $rs 
-				)) ;
+						'data' => $rs ,
+				));
 			} else {
 				//set code for login failed
-				$code = 1203 ;
-					
-				return $this->response(array (
-						'meta' => array (
-								'code' => $code,
-								'description' => 'Username or password wrong . Or the user not exist in system',
-								'message' => 'Username or password incorrect.'
+									
+				return $this->response(array(
+						'meta' => array(
+								'code' => USER_LOGIN_ERROR,
+								'description' => USER_LOGIN_ERROR_DES,
+								'message' => USER_LOGIN_ERROR_MESS,
 						),
-						'data' => null
-				) );
+						'data' => null,
+				));
 			}
 			
 		}
@@ -218,45 +218,43 @@ class Controller_V1_User extends Controller_Rest {
 	 */
 	public function put_logout() {
 		//get token from method put
-		$token =Input::put('token') ;
+		$token =Input::put('token');
 		
 		//check token is not empty
-		if ( !empty($token) ) {
+		if (!empty($token)) {
 			//checktoken is correct
-			$rs = User::check_token($token) ;
+			$rs = User::check_token($token);
  
-			if ( !is_array($rs) && $rs > 0 ) {
+			if (!is_array($rs) && $rs > 0) {
 				//called logout from model to update token = null
-				$row = User::logout($token) ;
+				$row = User::logout($token);
 				//check rows affected is > 0 logout ok
 				
 				//reset session
-				Auth::logout() ;
+				Auth::logout();
 			
-				return $this->response(
-						array(
+				return $this->response(array(
 						'meta' => array(
-								'code' => '200' ,
-								'messages' => 'Logout success!'
+								'code' => SUSSCESS_CODE,
+								'messages' => 'Logout success!',
 						) ,
-						'data' => null
+						'data' => null,
 				));
 				 
 				
 			} else {
 				//response error message return if check token wrong
-				return $this->response($rs) ;
+				return $this->response($rs);
 			}
 		} else {
 			//return error 1202 token invalid
-			return $this->response(
-					array(
+			return $this->response(array(
 				'meta' => array(
-					'code' => '1202' ,
-					'description' => 'Token is null' ,
-					'messages' => 'Token empty'
+					'code' => TOKEN_NULL_ERROR ,
+					'description' => TOKEN_NULL_MESS ,
+					'messages' => 'Token empty',
 				) ,
-				'data' => null
+				'data' => null,
 			));
 		}
 	}
@@ -268,55 +266,83 @@ class Controller_V1_User extends Controller_Rest {
 	 * @access  public
 	 * @return  Response
 	 */
-	public function put_update() {
+	public function put_update_user() {
 		//check token valid to update
-		$data['token'] =Input::put('token') ;
+		$data['token'] = Input::put('token');
 		
-		if ( !empty($data['token']) ) {
+		if (!empty($data['token'])) {
 			//check token exist
-			$rs = User::check_token($data['token']) ;
+			$rs = User::check_token($data['token']);
 			//check return data is user id ?
 			if ( is_numeric($rs) && $rs > 0) {
 				//get data used update and validate
-				$data['id'] = $rs ;
-				$data['lastname'] = Security::clean(Input::put('lastname'),$this->filters);
-				$data['firstname'] = Security::clean(Input::put('firstname'),$this->filters);
-				$data['email'] = Security::clean(Input::put('email'), $this->filters) ;
+				$data['id'] = $rs;
+				$data['lastname'] = Security::clean(Input::put('lastname'), $this->filters);
+				$data['firstname'] = Security::clean(Input::put('firstname'), $this->filters);
+				$data['email'] = Security::clean(Input::put('email'), $this->filters);
 								
-				$rs = User::validate_update($data) ;
+				$rs = User::validate_update($data);
 				//return error messgae if had error
-				if ( true !== $rs) {
+				if (true !== $rs) {
 					//error 1001 for data invalid
-					return $this->response($rs) ;
+					return $this->response($rs);
 				} else {
 					//not have error, continue update
-					$rs = User::update_user($data) ;
+					$rs = User::update_user($data);
 					return $this->response(
 					array(
 						'meta' => array(
-							'code' => '200' ,
-							'messages' => 'Update success' 
+							'code' => SUSSCESS_CODE,
+							'messages' => 'Update success', 
 						),
-						'data' => $rs
-					)) ;
+						'data' => $rs,
+					));
 				}
 				
 			} else {
 				//response error message return if check token wrong
-				return $this->response($rs) ;
+				return $this->response($rs);
 			}
 		} else {
 			//return error empty token
 			return $this->response(
 					array(
 							'meta' => array(
-									'code' => '1202' ,
-									'description' => 'Token is null' ,
-									'messages' => 'Token empty'
+									'code' => TOKEN_NULL_ERROR ,
+									'description' => TOKEN_NULL_MESS ,
+									'messages' => 'Token empty',
 							) ,
-							'data' => null
+							'data' => null,
 					));
 		}
+	}
+	/**
+	 * A function get user info by id
+	 * @link http://localhost/v1/users/{user_id}
+	 * method GET
+	 * @access  public
+	 * @return  Response
+	 */
+	public function get_user_info($id) {
+		//call function get user info use ORM package
+		//input id get from url
+		$result =  User::get_user_info($id);
+		
+		if (false == $result) {
+			//response error message
+			return array(
+					'meta' => array(
+							'code' => USER_NOT_EXIST_ERROR,
+							'description' => USER_NOT_EXIST_MESS,
+							'messages' => 'Get information of user failed',
+					),
+					'data' => null,
+			);
+		} else {
+			//response the info of user
+			return $this->response($result);
+		}
+		
 	}
 	 
 }

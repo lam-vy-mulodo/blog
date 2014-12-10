@@ -23,3 +23,5 @@ Fuel::$env = (isset($_SERVER['FUEL_ENV']) ? $_SERVER['FUEL_ENV'] : Fuel::DEVELOP
 
 // Initialize the framework with the config file.
 Fuel::init('config.php');
+//require config/constant for error code and mess
+require 'config/constant.php';
