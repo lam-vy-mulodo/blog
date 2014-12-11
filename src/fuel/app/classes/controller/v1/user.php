@@ -81,8 +81,8 @@ class Controller_V1_User extends Controller_Rest {
 					return $this->response(array(
 					        'meta' => array(
 								'code' => USER_EXIST_CODE,
-								'description' => USER_EXIST_DES,
-								'message' => USER_EXIST_MESS,
+								'description' => USER_EXIST_DESC,
+								'message' => USER_EXIST_MSG,
 					        ),
 							'data' => null,
 					        )
@@ -167,8 +167,8 @@ class Controller_V1_User extends Controller_Rest {
 				array(
 					'meta' => array(
 						'code' => USER_LOGGED_CODE,
-						'description' => USER_LOGGED_DES,
-						'messages' => USER_LOGGED_MESS,	
+						'description' => USER_LOGGED_DESC,
+						'messages' => USER_LOGGED_MSG,	
 					),
 					'data' => null,
 				)		        	
@@ -196,8 +196,8 @@ class Controller_V1_User extends Controller_Rest {
 				return $this->response(array(
 						'meta' => array(
 								'code' => USER_LOGIN_ERROR,
-								'description' => USER_LOGIN_ERROR_DES,
-								'message' => USER_LOGIN_ERROR_MESS,
+								'description' => USER_LOGIN_ERROR_DESC,
+								'message' => USER_LOGIN_ERROR_MSG,
 						),
 						'data' => null,
 				));
@@ -251,8 +251,8 @@ class Controller_V1_User extends Controller_Rest {
 			return $this->response(array(
 				'meta' => array(
 					'code' => TOKEN_NULL_ERROR ,
-					'description' => TOKEN_NULL_DES ,
-					'messages' => 'TOKEN_NULL_MESS',
+					'description' => TOKEN_NULL_DESC ,
+					'messages' => 'TOKEN_NULL_MSG',
 				) ,
 				'data' => null,
 			));
@@ -309,8 +309,8 @@ class Controller_V1_User extends Controller_Rest {
 					array(
 							'meta' => array(
 									'code' => TOKEN_NULL_ERROR ,
-									'description' => TOKEN_NULL_DES ,
-									'messages' => 'TOKEN_NULL_MESS',
+									'description' => TOKEN_NULL_DESC ,
+									'messages' => 'TOKEN_NULL_MSG',
 							) ,
 							'data' => null,
 					));
@@ -333,7 +333,7 @@ class Controller_V1_User extends Controller_Rest {
 			return array(
 					'meta' => array(
 							'code' => USER_NOT_EXIST_ERROR,
-							'description' => USER_NOT_EXIST_MESS,
+							'description' => USER_NOT_EXIST_MSG,
 							'messages' => 'Get information of user failed',
 					),
 					'data' => null,
@@ -362,7 +362,7 @@ class Controller_V1_User extends Controller_Rest {
 			return array(
 					'meta' => array(
 							'code' => USER_NOT_EXIST_ERROR,
-							'description' => USER_NOT_EXIST_MESS,
+							'description' => USER_NOT_EXIST_MSG,
 							'messages' => 'Get information of user failed',
 					),
 					'data' => null,
@@ -413,8 +413,8 @@ class Controller_V1_User extends Controller_Rest {
 					array(
 							'meta' => array(
 									'code' => TOKEN_NULL_ERROR,
-									'description' => TOKEN_NULL_DES,
-									'messages' => TOKEN_NULL_MESS,
+									'description' => TOKEN_NULL_DESC,
+									'messages' => TOKEN_NULL_MSG,
 							),
 							'data' => null,
 		 		)

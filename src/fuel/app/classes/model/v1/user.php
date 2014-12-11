@@ -52,11 +52,11 @@ class User extends \ORM\Model {
 		$val->add_field('firstname', 'First name', 'required');
 		
 		// set custom message for rules
-		$val->set_message('required', 'Username, password, email, lastname and firstname are required');
-		$val->set_message('min_length', 'Username and password must be contain at least 5 characters');
-		$val->set_message('max_length', 'Username may contain more than 50 characters');
-		$val->set_message('valid_email', 'Email incorrect');
-		$val->set_message('valid_string', 'Username or password may contain special characters');
+		$val->set_Message('required', 'Username, password, email, lastname and firstname are required');
+		$val->set_Message('min_length', 'Username and password must be contain at least 5 characters');
+		$val->set_Message('max_length', 'Username may contain more than 50 characters');
+		$val->set_Message('valid_email', 'Email incorrect');
+		$val->set_Message('valid_string', 'Username or password may contain special characters');
 		
 		//print_r($data);
 		// create message array
@@ -66,7 +66,7 @@ class User extends \ORM\Model {
 			foreach ($val->error() as $field => $error) {
 				// add error message to array for return
 				$_error[] = array(
-						'message' => $error->get_message() 
+						'message' => $error->get_Message() 
 				);
 			}
 			Validation::_empty($val);
@@ -76,7 +76,7 @@ class User extends \ORM\Model {
 			return array(
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
-							'description' => USER_VALIDATE_ERROR_MESS,
+							'description' => USER_VALIDATE_ERROR_MSG,
 							'message' => $_error,
 					),
 					'data' => null,
@@ -115,8 +115,8 @@ class User extends \ORM\Model {
 		$val->add_field('firstname', 'First name', 'required');
 		
 		// set custom message for rules
-		$val->set_message('required', 'Last name, first name and email must be required');
-		$val->set_message('valid_email', 'Email incorrect');
+		$val->set_Message('required', 'Last name, first name and email must be required');
+		$val->set_Message('valid_email', 'Email incorrect');
 				
 		
 		// create message array
@@ -127,7 +127,7 @@ class User extends \ORM\Model {
 				// add error message to array for return
 				
 				$_error[] = array(
-						'message' => $error->get_message()
+						'message' => $error->get_Message()
 				);
 			}
 			Validation::_empty($val);
@@ -137,7 +137,7 @@ class User extends \ORM\Model {
 			return array (
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
-							'description' => USER_VALIDATE_ERROR_MESS,
+							'description' => USER_VALIDATE_ERROR_MSG,
 							'message' => $_error,
 					),
 					'data' => null,
@@ -168,10 +168,10 @@ class User extends \ORM\Model {
 		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');	
 	
 		// set custom message for rules
-		$val->set_message('required', 'The password are required');
-		$val->set_message('min_length', 'The password must be contain at least 5 characters');
-		$val->set_message('max_length', 'The password may contain more than 50 characters');		
-		$val->set_message('valid_string', 'The password may contain special characters');
+		$val->set_Message('required', 'The password are required');
+		$val->set_Message('min_length', 'The password must be contain at least 5 characters');
+		$val->set_Message('max_length', 'The password may contain more than 50 characters');		
+		$val->set_Message('valid_string', 'The password may contain special characters');
 	
 		//print_r($data);
 		// create message array
@@ -181,7 +181,7 @@ class User extends \ORM\Model {
 			foreach ($val->error() as $field => $error) {
 				// add error message to array for return
 				$_error[] = array(
-						'message' => $error->get_message()
+						'message' => $error->get_Message()
 				);
 			}
 			Validation::_empty($val);
@@ -190,8 +190,8 @@ class User extends \ORM\Model {
 				
 			return array(
 					'meta' => array(
-							'code' => USER_VALIDATE_CHANGE_PASS_ERROR,
-							'description' => USER_VALIDATE_ERROR_MESS,
+							'code' => USER_VALIDATE_ERROR,
+							'description' => USER_VALIDATE_ERROR_MSG,
 							'message' => $_error,
 					),
 					'data' => null,
@@ -336,7 +336,7 @@ class User extends \ORM\Model {
 				return array(
 					'meta' => array(
 						'code' => TOKEN_NOT_EXIST_ERROR ,
-						'description' => TOKEN_NOT_EXIST_MESS ,
+						'description' => TOKEN_NOT_EXIST_MSG ,
 						'messages' => 'Access is denied '
 				),
 					'data' => null
@@ -387,7 +387,7 @@ class User extends \ORM\Model {
 				return array(
 						'meta' => array(
 								'code' => USER_NOT_EXIST_ERROR ,
-								'description' => USER_NOT_EXIST_MESS ,
+								'description' => USER_NOT_EXIST_MSG ,
 								'messages' => 'Get information of user failed',
 						),
 						'data' => null,
@@ -473,7 +473,7 @@ class User extends \ORM\Model {
 	* @return 200 for success
 	*
 	*/
-	public static function change_password($password, $id, $old_password) {
+	public static function change_password($id, $old_password, $password) {
 				
 		//validate new password
 		$val = self::validate_password($password) ;
@@ -508,8 +508,8 @@ class User extends \ORM\Model {
 					return array(
 					'meta' => array(
 						'code' => USER_CHANGE_PASS_ERROR,
-						'description' => USER_CHANGE_PASS_DES,
-						'messages' => USER_CHANGE_PASS_MESS,
+						'description' => USER_CHANGE_PASS_DESC,
+						'messages' => USER_CHANGE_PASS_MSG,
 					),
 					'data' => null);
 				}
