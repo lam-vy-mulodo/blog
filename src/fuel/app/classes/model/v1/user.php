@@ -147,6 +147,61 @@ class User extends \ORM\Model {
 			return true;
 		}
 	}
+	/*
+	* method validation for check the new password change
+	* @param new password recieve from put method
+	* @return array error of input data
+	* @return true for valid
+	*/
+	public static function validate_password($password) {
+		
+		$input = array('password' => $password);
+		//check if Form validation created, use instance for retrieve it not use forge
+		$val = \Validation::active();
+		if ($val) {
+			$val = \Validation::forge();
+		} else {
+			$val = \Validation::instance();
+		}
+		//$val = Validation::forge();
+			
+		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');	
+	
+		// set custom message for rules
+		$val->set_message('required', 'The password are required');
+		$val->set_message('min_length', 'The password must be contain at least 5 characters');
+		$val->set_message('max_length', 'The password may contain more than 50 characters');		
+		$val->set_message('valid_string', 'The password may contain special characters');
+	
+		//print_r($data);
+		// create message array
+		$_error = array();
+		if (! $val->run($input)) {
+				
+			foreach ($val->error() as $field => $error) {
+				// add error message to array for return
+				$_error[] = array(
+						'message' => $error->get_message()
+				);
+			}
+			Validation::_empty($val);
+			//var_dump($_error);die;
+			// return error message
+				
+			return array(
+					'meta' => array(
+							'code' => USER_VALIDATE_CHANGE_PASS_ERROR,
+							'description' => USER_VALIDATE_ERROR_MESS,
+							'message' => $_error,
+					),
+					'data' => null,
+			);
+		} else {
+			// return 1 for valid all data
+			return true;
+		}
+	}
+	
 	
 	/*
 	 * the method use to check username exist in database or not return true for exist else return false
@@ -410,6 +465,63 @@ class User extends \ORM\Model {
 			Log::error($ex->getMessage());
 			return $ex->getMessage();
 		}
+	}
+	/*
+	 * function to update the password for user
+	* @param input is id of user account
+	* @param password for update it into db, old_password to check
+	* @return 200 for success
+	*
+	*/
+	public static function change_password($password, $id, $old_password) {
+				
+		//validate new password
+		$val = self::validate_password($password) ;
+		if (true === $val) {
+			//hash password with auth package
+			$password = Auth::hash_password($password);
+			//hash old_password with auth
+			$old_password = Auth::hash_password($old_password);
+			
+			try {
+			
+				//the query to update, check old password correct when update new pass
+				$query = DB::query("UPDATE user SET password = :password WHERE id = :id and password = :old_password");
+				//bind param
+				$query->bind('password', $password);
+				$query->bind('id', $id);
+				$query->bind('old_password', $old_password);
+					
+				//execute query sql
+				$result = $query->execute();
+					
+				//check the number row affected
+				if ($result > 0) {
+					//return success code
+					return array(
+							'meta' => array(
+									'code' => SUSSCESS_CODE,
+									'messages' => 'Change password success !'
+							),
+							'data' => null);
+				} else {
+					return array(
+					'meta' => array(
+						'code' => USER_CHANGE_PASS_ERROR,
+						'description' => USER_CHANGE_PASS_DES,
+						'messages' => USER_CHANGE_PASS_MESS,
+					),
+					'data' => null);
+				}
+			
+			} catch (\Exception $ex) {
+				Log::error($ex->getMessage());
+				return $ex->getMessage();
+			}
+		} else {
+			return $val;
+		}
+		
 	}
 	
 }

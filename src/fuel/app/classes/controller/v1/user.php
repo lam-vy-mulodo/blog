@@ -251,8 +251,8 @@ class Controller_V1_User extends Controller_Rest {
 			return $this->response(array(
 				'meta' => array(
 					'code' => TOKEN_NULL_ERROR ,
-					'description' => TOKEN_NULL_MESS ,
-					'messages' => 'Token empty',
+					'description' => TOKEN_NULL_DES ,
+					'messages' => 'TOKEN_NULL_MESS',
 				) ,
 				'data' => null,
 			));
@@ -309,8 +309,8 @@ class Controller_V1_User extends Controller_Rest {
 					array(
 							'meta' => array(
 									'code' => TOKEN_NULL_ERROR ,
-									'description' => TOKEN_NULL_MESS ,
-									'messages' => 'Token empty',
+									'description' => TOKEN_NULL_DES ,
+									'messages' => 'TOKEN_NULL_MESS',
 							) ,
 							'data' => null,
 					));
@@ -343,6 +343,83 @@ class Controller_V1_User extends Controller_Rest {
 			return $this->response($result);
 		}
 		
+	}
+	/*
+	 * function to test get user info use $this->param
+	 * method GET
+	 * config the routes for /:name_param - the name of param
+	*/
+	public function get_user_info2() {
+		
+		$id = $this->param('id');
+		
+		//call function get user info use ORM package
+		//input id get from url
+		$result =  User::get_user_info($id);
+	
+		if (false == $result) {
+			//response error message
+			return array(
+					'meta' => array(
+							'code' => USER_NOT_EXIST_ERROR,
+							'description' => USER_NOT_EXIST_MESS,
+							'messages' => 'Get information of user failed',
+					),
+					'data' => null,
+			);
+		} else {
+			//response the info of user
+			return $this->response($result);
+		}
+	
+	}
+	/**
+	 * the function for user change current password
+	 * @link http://localhost/v1/users/password
+	 * method :PUT
+	 * @access public
+	 * @return Response
+	 */
+	public function put_change_password() {
+		//get data
+		$token = Security::clean(Input::put('token'), $this->filters);
+		$password = Security::clean(Input::put('password'), $this->filters);
+		$old_password = Security::clean(Input::put('old_password'), $this->filters);
+		
+		//check token is null
+		if (!empty($token)) {
+			
+			$id = User::check_token($token); 
+			//return the id of user when check the token correct
+			//else return array error
+			
+			if(is_numeric($id) && $id > 0) {
+
+				//token exist in db , continue change password				
+				$result = User::change_password($password, $id, $old_password);
+				
+				//return the result
+				return $this->response($result);
+				
+			} else {
+				
+				//token wrong, return error , access denied
+				return $this->response($id);
+			}
+			
+		} else {
+			//response token null error
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => TOKEN_NULL_ERROR,
+									'description' => TOKEN_NULL_DES,
+									'messages' => TOKEN_NULL_MESS,
+							),
+							'data' => null,
+		 		)
+			);
+		}
 	}
 	 
 }
