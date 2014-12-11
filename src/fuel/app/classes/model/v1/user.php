@@ -52,11 +52,11 @@ class User extends \ORM\Model {
 		$val->add_field('firstname', 'First name', 'required');
 		
 		// set custom message for rules
-		$val->set_message('required', 'Username, password, email, lastname and firstname are required');
-		$val->set_message('min_length', 'Username and password must be contain at least 5 characters');
-		$val->set_message('max_length', 'Username may contain more than 50 characters');
-		$val->set_message('valid_email', 'Email incorrect');
-		$val->set_message('valid_string', 'Username or password may contain special characters');
+		$val->set_Message('required', 'Username, password, email, lastname and firstname are required');
+		$val->set_Message('min_length', 'Username and password must be contain at least 5 characters');
+		$val->set_Message('max_length', 'Username may contain more than 50 characters');
+		$val->set_Message('valid_email', 'Email incorrect');
+		$val->set_Message('valid_string', 'Username or password may contain special characters');
 		
 		//print_r($data);
 		// create message array
@@ -66,7 +66,7 @@ class User extends \ORM\Model {
 			foreach ($val->error() as $field => $error) {
 				// add error message to array for return
 				$_error[] = array(
-						'message' => $error->get_message() 
+						'message' => $error->get_Message() 
 				);
 			}
 			Validation::_empty($val);
@@ -76,7 +76,7 @@ class User extends \ORM\Model {
 			return array(
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
-							'description' => USER_VALIDATE_ERROR_MESS,
+							'description' => USER_VALIDATE_ERROR_MSG,
 							'message' => $_error,
 					),
 					'data' => null,
@@ -115,8 +115,8 @@ class User extends \ORM\Model {
 		$val->add_field('firstname', 'First name', 'required');
 		
 		// set custom message for rules
-		$val->set_message('required', 'Last name, first name and email must be required');
-		$val->set_message('valid_email', 'Email incorrect');
+		$val->set_Message('required', 'Last name, first name and email must be required');
+		$val->set_Message('valid_email', 'Email incorrect');
 				
 		
 		// create message array
@@ -127,7 +127,7 @@ class User extends \ORM\Model {
 				// add error message to array for return
 				
 				$_error[] = array(
-						'message' => $error->get_message()
+						'message' => $error->get_Message()
 				);
 			}
 			Validation::_empty($val);
@@ -137,7 +137,7 @@ class User extends \ORM\Model {
 			return array (
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
-							'description' => USER_VALIDATE_ERROR_MESS,
+							'description' => USER_VALIDATE_ERROR_MSG,
 							'message' => $_error,
 					),
 					'data' => null,
@@ -147,6 +147,61 @@ class User extends \ORM\Model {
 			return true;
 		}
 	}
+	/*
+	* method validation for check the new password change
+	* @param new password recieve from put method
+	* @return array error of input data
+	* @return true for valid
+	*/
+	public static function validate_password($password) {
+		
+		$input = array('password' => $password);
+		//check if Form validation created, use instance for retrieve it not use forge
+		$val = \Validation::active();
+		if ($val) {
+			$val = \Validation::forge();
+		} else {
+			$val = \Validation::instance();
+		}
+		//$val = Validation::forge();
+			
+		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');	
+	
+		// set custom message for rules
+		$val->set_Message('required', 'The password are required');
+		$val->set_Message('min_length', 'The password must be contain at least 5 characters');
+		$val->set_Message('max_length', 'The password may contain more than 50 characters');		
+		$val->set_Message('valid_string', 'The password may contain special characters');
+	
+		//print_r($data);
+		// create message array
+		$_error = array();
+		if (! $val->run($input)) {
+				
+			foreach ($val->error() as $field => $error) {
+				// add error message to array for return
+				$_error[] = array(
+						'message' => $error->get_Message()
+				);
+			}
+			Validation::_empty($val);
+			//var_dump($_error);die;
+			// return error message
+				
+			return array(
+					'meta' => array(
+							'code' => USER_VALIDATE_ERROR,
+							'description' => USER_VALIDATE_ERROR_MSG,
+							'message' => $_error,
+					),
+					'data' => null,
+			);
+		} else {
+			// return 1 for valid all data
+			return true;
+		}
+	}
+	
 	
 	/*
 	 * the method use to check username exist in database or not return true for exist else return false
@@ -281,7 +336,7 @@ class User extends \ORM\Model {
 				return array(
 					'meta' => array(
 						'code' => TOKEN_NOT_EXIST_ERROR ,
-						'description' => TOKEN_NOT_EXIST_MESS ,
+						'description' => TOKEN_NOT_EXIST_MSG ,
 						'messages' => 'Access is denied '
 				),
 					'data' => null
@@ -332,7 +387,7 @@ class User extends \ORM\Model {
 				return array(
 						'meta' => array(
 								'code' => USER_NOT_EXIST_ERROR ,
-								'description' => USER_NOT_EXIST_MESS ,
+								'description' => USER_NOT_EXIST_MSG ,
 								'messages' => 'Get information of user failed',
 						),
 						'data' => null,
@@ -410,6 +465,63 @@ class User extends \ORM\Model {
 			Log::error($ex->getMessage());
 			return $ex->getMessage();
 		}
+	}
+	/*
+	 * function to update the password for user
+	* @param input is id of user account
+	* @param password for update it into db, old_password to check
+	* @return 200 for success
+	*
+	*/
+	public static function change_password($id, $old_password, $password) {
+				
+		//validate new password
+		$val = self::validate_password($password) ;
+		if (true === $val) {
+			//hash password with auth package
+			$password = Auth::hash_password($password);
+			//hash old_password with auth
+			$old_password = Auth::hash_password($old_password);
+			
+			try {
+			
+				//the query to update, check old password correct when update new pass
+				$query = DB::query("UPDATE user SET password = :password WHERE id = :id and password = :old_password");
+				//bind param
+				$query->bind('password', $password);
+				$query->bind('id', $id);
+				$query->bind('old_password', $old_password);
+					
+				//execute query sql
+				$result = $query->execute();
+					
+				//check the number row affected
+				if ($result > 0) {
+					//return success code
+					return array(
+							'meta' => array(
+									'code' => SUSSCESS_CODE,
+									'messages' => 'Change password success !'
+							),
+							'data' => null);
+				} else {
+					return array(
+					'meta' => array(
+						'code' => USER_CHANGE_PASS_ERROR,
+						'description' => USER_CHANGE_PASS_DESC,
+						'messages' => USER_CHANGE_PASS_MSG,
+					),
+					'data' => null);
+				}
+			
+			} catch (\Exception $ex) {
+				Log::error($ex->getMessage());
+				return $ex->getMessage();
+			}
+		} else {
+			return $val;
+		}
+		
 	}
 	
 }
