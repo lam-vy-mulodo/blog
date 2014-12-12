@@ -34,6 +34,10 @@ class Test_Model_V1_User extends TestCase {
 		
 		unset($this->_user);
 		
+		
+	}
+	public static function tearDownAfterClass() {
+		
 	}
 	
 	/**
@@ -545,12 +549,14 @@ class Test_Model_V1_User extends TestCase {
      */
     public function reset_data_update() {
     	//data reset
+    	$password = Auth::hash_password('12345');
     	$user = array (
     			'id' => '88',
     			'firstname' => 'vy',
     			'lastname' => 'lam' ,
     			'email' => 'lam.vy@gmail.com',
     			'modified_at' => '1417675134',
+    			'password' => $password,
     
     	);
     	//update reset user info id 88
@@ -559,7 +565,8 @@ class Test_Model_V1_User extends TestCase {
 		    			'firstname' => $user['firstname'] ,
 		    			'lastname' => $user['lastname'] ,
 		    			'email' => $user['email'] ,
-		    			'modified_at' => $user['modified_at']
+		    			'modified_at' => $user['modified_at'],
+		    	     	'password' => $password
 		    		 ))->where('id', $user['id'])->execute();
     	
     	
@@ -627,6 +634,98 @@ class Test_Model_V1_User extends TestCase {
     	return $test_data;
     	
     }
+    /**
+	 * funtion to test validate password input to change new pass
+	 * @group validate_password
+	 * @dataProvider password_provider	
+	 */
+	public function test_validate_password_notok($data) {
+						
+		$val = $this->_user->validate_password($data['password']);						
+		//print_r($val['meta']['message']);
+		
+		$this->assertEquals(1004, $val['meta']['code']);
+		print_r($val);
+		
+	}
+	/**
+	 * funtion to test validate password input to change new pass
+	 * @group validate_password_ok
+	 * 
+	 */
+	public function test_validate_password_ok() {
+	
+		$password = 'aaa456';
+		$val = $this->_user->validate_password($password);
+		//print_r($val['meta']['message']);
+	
+		$this->assertTrue($val);
+		
+	
+	}
+	/**
+	 * function to test update new password is ok
+	 * @group update_pass_ok
+	 */
+	public function test_change_password_ok() {
+	
+		$id = '88' ;
+		$old_password = '12345';
+		$new_password = 'aaa456';
+		//call function to test update
+		$rs = $this->_user->change_password($id, $old_password, $new_password);
+		//compare with code 200 is success
+		$this->assertEquals('200', $rs['meta']['code']);
+		//reset data
+		
+		$this->reset_data_update();	
+	}
+	
+	/**
+	 * function to test update new password not ok
+	 * b/c the old password inputed is not match with db
+	 * compare with error 2004
+	 * @group update_pass_notok 
+	 */
+	public function test_change_password_notok() {
+		$id = '88' ;
+		$old_password = '123456';
+		$new_password = 'aaa456';
+		//call function to test update
+		$rs = $this->_user->change_password($id, $old_password, $new_password);
+		//compare with code 200 is success
+		$this->assertEquals('2004', $rs['meta']['code']);
+	}
+	/**
+	 * Define test data set
+	 *
+	 * @return array password
+	 */
+	public function password_provider() {
+		$test_data = array();
+		
+		//null password
+		$test_data[][] = array(
+			'password' => '',
+		);
+		//password at least 5 characters
+		$test_data[][] = array(
+			'password' => '123',
+		);
+		//password contain greater than 50 char
+		$test_data[][] = array(
+			'password' => 'weudhweuiryuiw4y5377846127361825376154yrhesjbfseufhiosuou897284647',
+		);
+		//password contain special char
+		$test_data[][] = array(
+			'password' => ' jhbfsh@#$@#%',
+		);
+		//return array test data provider
+		return $test_data;
+		 
+	}
+	
+	
 
 
 
