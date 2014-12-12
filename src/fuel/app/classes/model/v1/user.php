@@ -23,6 +23,56 @@ class User extends \ORM\Model {
 	protected  static  $_properties = array('id', 'username', 'lastname', 'firstname', 'email', 'created_at', 'modified_at');
 	
 	/*
+	 * the method use to validation data 
+	 * @param input data such as username, password, lastname...
+	 */
+	public static function validate($input) {
+		
+		//check if Form validation created, use instance for retrieve it not use forge
+		$val = \Validation::active();
+		if ($val) {
+			$val = \Validation::forge();
+		} else {
+			$val = \Validation::instance();
+		}
+		//$val = Validation::forge();
+		
+		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');
+		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');
+		$val->add_field('email', 'Email address', 'required|valid_email');
+		$val->add_field('lastname', 'Last name', 'required');
+		$val->add_field('firstname', 'First name', 'required');
+		
+		// set custom message for rules
+		//$val->set_Message('required', 'Username, password, email, lastname and firstname are required');
+		//$val->set_Message('min_length', 'Username and password must be contain at least 5 characters');
+		//$val->set_Message('max_length', 'Username may contain more than 50 characters');
+		//$val->set_Message('valid_email', 'Email incorrect');
+		//$val->set_Message('valid_string', 'Username or password may contain special characters');
+		
+		//print_r($data);
+		// create message array
+		$_error = array();
+		if (! $val->run($input)) {
+				
+			foreach ($val->error() as $field => $error) {
+				// add error message to array for return
+				$_error[] = array(
+						'message' => $error->get_Message()
+				);
+			}
+			Validation::_empty($val);
+				
+			//var_dump($_error);die;
+			// return error message
+				
+			return $_error ;
+		} else {
+			// return 1 for valid all data
+			return true;
+		}
+	}
+	/*
 	 * method validation for check information input to database
 	 * @param input data  recieve from post method
 	 * @return array error of input data
@@ -36,53 +86,18 @@ class User extends \ORM\Model {
 				'lastname' => $data['lastname'],
 				'email' => $data['email'],
 		);
-		//check if Form validation created, use instance for retrieve it not use forge		
-		$val = \Validation::active();
-        if ($val) {
-             $val = \Validation::forge();
-        } else {
-             $val = \Validation::instance();
-        }
-		//$val = Validation::forge();
 		
-		$val->add_field('username', 'Username', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');
-		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');
-		$val->add_field('email', 'Email address', 'required|valid_email');
-		$val->add_field('lastname', 'Last name', 'required');
-		$val->add_field('firstname', 'First name', 'required');
-		
-		// set custom message for rules
-		$val->set_Message('required', 'Username, password, email, lastname and firstname are required');
-		$val->set_Message('min_length', 'Username and password must be contain at least 5 characters');
-		$val->set_Message('max_length', 'Username may contain more than 50 characters');
-		$val->set_Message('valid_email', 'Email incorrect');
-		$val->set_Message('valid_string', 'Username or password may contain special characters');
-		
-		//print_r($data);
-		// create message array
-		$_error = array();
-		if (! $val->run($input)) {
-			
-			foreach ($val->error() as $field => $error) {
-				// add error message to array for return
-				$_error[] = array(
-						'message' => $error->get_Message() 
-				);
-			}
-			Validation::_empty($val);
-			//var_dump($_error);die;
-			// return error message
-			
+		$result = self::validate($input);
+		if (true !== $result) {
 			return array(
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
 							'description' => USER_VALIDATE_ERROR_MSG,
-							'message' => $_error,
+							'message' => $result,
 					),
 					'data' => null,
 			);
 		} else {
-			// return 1 for valid all data
 			return true;
 		}
 	}
@@ -93,52 +108,27 @@ class User extends \ORM\Model {
 	 * 
 	 */
 	public static function validate_update($data) {
-		
+		/*
+		 * create field username and password just for run unit test
+		 * the unit testing always run the validation created before
+		 * so it will check field username, password created in the validate_create user		
+		 */
 		$input = array(
 				'firstname' => $data['firstname'],
 				'lastname' => $data['lastname'],
-				'email' => $data['email']
+				'email' => $data['email'],
+				'username' =>'example',
+				'password' => 'example'
+								
 		);		
 		
-		//check if Form validation created, use instance for retrieve it not use forge
-		
-		$val = \Validation::active();
-		if ($val) {
-			$val = \Validation::forge();
-		} else {
-			$val = \Validation::instance();
-		}
-				
-		
-		$val->add_field('email', 'Email address', 'required|valid_email');
-		$val->add_field('lastname', 'Last name', 'required');
-		$val->add_field('firstname', 'First name', 'required');
-		
-		// set custom message for rules
-		$val->set_Message('required', 'Last name, first name and email must be required');
-		$val->set_Message('valid_email', 'Email incorrect');
-				
-		
-		// create message array
-		$_error = array();
-		if (!$val->run($input)) {
-			
-			foreach($val->error() as $field => $error) {
-				// add error message to array for return
-				
-				$_error[] = array(
-						'message' => $error->get_Message()
-				);
-			}
-			Validation::_empty($val);
-			//var_dump($_error);die;
-			// return error message
-			
+		$result = self::validate($input);
+		if (true !== $result) {	
 			return array (
 					'meta' => array(
 							'code' => USER_VALIDATE_ERROR,
 							'description' => USER_VALIDATE_ERROR_MSG,
-							'message' => $_error,
+							'message' => $result,
 					),
 					'data' => null,
 				);
@@ -154,45 +144,26 @@ class User extends \ORM\Model {
 	* @return true for valid
 	*/
 	public static function validate_password($password) {
-		
-		$input = array('password' => $password);
-		//check if Form validation created, use instance for retrieve it not use forge
-		$val = \Validation::active();
-		if ($val) {
-			$val = \Validation::forge();
-		} else {
-			$val = \Validation::instance();
-		}
-		//$val = Validation::forge();
-			
-		$val->add_field('password', 'Password', 'required|min_length[5]|max_length[50]|valid_string[alpha,numeric]');	
-	
-		// set custom message for rules
-		$val->set_Message('required', 'The password are required');
-		$val->set_Message('min_length', 'The password must be contain at least 5 characters');
-		$val->set_Message('max_length', 'The password may contain more than 50 characters');		
-		$val->set_Message('valid_string', 'The password may contain special characters');
-	
-		//print_r($data);
-		// create message array
-		$_error = array();
-		if (! $val->run($input)) {
-				
-			foreach ($val->error() as $field => $error) {
-				// add error message to array for return
-				$_error[] = array(
-						'message' => $error->get_Message()
-				);
-			}
-			Validation::_empty($val);
-			//var_dump($_error);die;
-			// return error message
-				
+	   /*
+		* create field some field just for run unit test
+		* the unit testing always run the validation created before
+		* so it will check fields username, password... created in the validate_create user and update_user
+		*/
+		$input = array(
+				'firstname' => 'test',
+				'lastname' => 'test',
+				'email' => 'test@mail.com',
+				'username' =>'example',
+				'password' => $password
+								
+		);	
+		$result = self::validate($input);
+		if (true !== $result) {		
 			return array(
 					'meta' => array(
-							'code' => USER_VALIDATE_ERROR,
+							'code' => USER_VALIDATE_CHANGE_PASS_ERROR,
 							'description' => USER_VALIDATE_ERROR_MSG,
-							'message' => $_error,
+							'message' => $result,
 					),
 					'data' => null,
 			);
@@ -473,11 +444,9 @@ class User extends \ORM\Model {
 	* @return 200 for success
 	*
 	*/
-	public static function change_password($id, $old_password, $password) {
-				
-		//validate new password
-		$val = self::validate_password($password) ;
-		if (true === $val) {
+	public static function change_password($id, $old_password,$password) {
+			
+		
 			//hash password with auth package
 			$password = Auth::hash_password($password);
 			//hash old_password with auth
@@ -517,10 +486,7 @@ class User extends \ORM\Model {
 			} catch (\Exception $ex) {
 				Log::error($ex->getMessage());
 				return $ex->getMessage();
-			}
-		} else {
-			return $val;
-		}
+			}	
 		
 	}
 	
