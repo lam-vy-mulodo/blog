@@ -37,6 +37,9 @@ define('USER_VALIDATE_CHANGE_PASS_ERROR', '1004');
 define('USER_CHANGE_PASS_ERROR', '2004');
 define('USER_CHANGE_PASS_DESC', 'The old password incorrect or new password same as the old_password!');
 define('USER_CHANGE_PASS_MSG', 'Can\' change password');
+//search user by name
+define('USER_SEARCH_ERROR', '2005');
+define('USER_SEARCH_MSG', 'Search user failed');
 //token null error code
 
 /*
