@@ -437,8 +437,8 @@ class User extends \ORM\Model {
 			return $ex->getMessage();
 		}
 	}
-	/*
-	 * function to update the password for user
+   /*
+	* function to update the password for user
 	* @param input is id of user account
 	* @param password for update it into db, old_password to check
 	* @return 200 for success
@@ -488,6 +488,37 @@ class User extends \ORM\Model {
 				return $ex->getMessage();
 			}	
 		
+	}
+	
+    /*
+	* function to search user account by name
+	* @param input is name
+	* search by lastname, firstname and username contain the keyword
+	* @return the data array for search
+	*
+	*/
+	public static function search_user($name) {
+		//check the length of the key
+		try {
+			if (strlen($name) >= 4) {
+				//search by full text index
+				$query = DB::query("SELECT id, username, lastname, firstname, email
+							 FROM user WHERE ( match(username, lastname, firstname)
+							 against('*$name*' IN BOOLEAN MODE) ) and status = 1 ");
+			} else {
+				//search by like
+				$query = DB::query("SELECT id, username, lastname, firstname, email
+						FROM user WHERE
+						( username LIKE '%$name%' or lastname LIKE '%$name%' or firstname LIKE '%$name%')
+						and status =1 ");
+			}
+			
+			//return the result
+			return $query->execute();
+		} catch (\Exception $ex) {
+			Log::error($ex->getMessage());
+			return $ex->getMessage();
+		}
 	}
 	
 }

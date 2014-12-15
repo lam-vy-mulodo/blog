@@ -421,5 +421,62 @@ class Controller_V1_User extends Controller_Rest {
 			);
 		}
 	}
-	 
+	
+	/**
+	 * the function for search user by name
+	 * @link http://localhost/v1/users?name={name}
+	 * method :GET
+	 * @access public
+	 * @return Response
+	 */
+	public function get_search_user() {
+		//get the keyword for search
+		$name = Security::clean(Input::get('name'), $this->filters);
+		//check empty
+		if (empty($name)) {
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => USER_SEARCH_ERROR,
+									'description' => 'The keyword search is empty. Please input it.',
+									'messages' => USER_SEARCH_MSG,
+							),
+							'data' => null,
+					)
+			);
+		} else {
+			//get the user for search
+			$result = User::search_user($name);
+			//count rs
+			$num = count($result);
+			//check have user
+			if ($num > 0) {
+				//have user for search
+				return $this->response(
+						array(
+								'meta' => array(
+										'code' => SUSSCESS_CODE,
+										'messages' => 'Search complete!',
+										'result' => $num . ' user matched .'
+								),
+								'data' => $result,
+						)
+				);
+			} else {
+				//return message not have any user
+				return $this->response(
+						array(
+								'meta' => array(
+										'code' => USER_SEARCH_ERROR,
+										'description' => 'Not have any user for result.',
+										'messages' => USER_SEARCH_MSG,
+								),
+								'data' => null,
+						)
+				);
+			}
+		}
+		
+		return $this->response($name);
+	}
 }
