@@ -384,6 +384,97 @@ class Test_Controller_V1_User extends TestCase {
 	}
 	
 	/**
+	 * use test validate change password not ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/password
+	 * compare with code 1004 for not valid
+	 * @group validate_pass_notok2
+	 * @dataProvider password_provider
+	 * @depends test_login_ok
+	 */
+	public function test_validate_pass_notok($test_data,$data) {
+	
+		$test_data['token'] = $data['token'];
+
+		$method = 'PUT';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/password';
+		$result = $this->init_curl($test_data, $method, $link);
+		
+		//compare with error code 1004 for invalid data
+		$this->assertEquals('1004', $result['meta']['code']);
+	}
+	
+	/**
+	 * use test change password ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/password
+	 * compare with code 200 when success
+	 * @group update_pass_ok2
+	 * @depends test_login_ok
+	 */
+	public function test_change_pass_ok($user) {
+	
+		$data['token'] = $user['token'];
+		$data['old_password'] = '12345';
+		$data['password'] = 'aaa456';
+		//set method and link
+		$method = 'PUT';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/password';
+		$result = $this->init_curl($data, $method, $link);
+	
+		//compare with 200 code ok
+		$this->assertEquals('200', $result['meta']['code']);
+		//reset the old password for user id 30
+		print_r($result) ;
+		$this->reset_password();
+		
+	}
+	
+	/**
+	 * use test change password not ok
+	 * the old password is not match with db
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/users/password
+	 * compare with code 2004 error code
+	 * @group update_pass_notok2
+	 * @depends test_login_ok
+	 */
+	public function test_change_pass_notok($user) {
+	
+		$data['token'] = $user['token'];
+		$data['old_password'] = '123456';
+		$data['password'] = 'aaa456';
+		//set method and link
+		$method = 'PUT';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/password';
+		$result = $this->init_curl($data, $method, $link);
+	
+		//compare with 200 code ok
+		$this->assertEquals('2004', $result['meta']['code']);
+		//print the response message to check
+		print_r($result) ;
+		
+		
+	}
+	
+	/**
+	 * the function use to reset the new password have updated
+	 * id user is 30
+	 * old pass is 12345
+	 */
+	public function reset_password() {
+		$password = Auth::hash_password('12345');
+		//call get user info by id =30
+		$query = DB::update('user')->set(
+				array(
+						'password' => $password,
+				))->where('id', 30)->execute();
+	}
+	
+	/**
 	 * use test logout function ok
 	 * get token from login, test with this token
 	 * method PUT
@@ -593,4 +684,43 @@ class Test_Controller_V1_User extends TestCase {
 		return $test_data;
 		 
 	}
+	
+	/**
+	 * Define test data set
+	 * 
+	 * @return array password
+	 * 
+	 */
+	public function password_provider() {
+		$test_data = array();
+	
+		//null password
+		$test_data[][] = array(
+				'password' => '',
+				'token' => '',
+				'old_password' => '12345'
+		);
+		//password at least 5 characters
+		$test_data[][] = array(
+				'password' => '123',
+				'token' => '',
+				'old_password' => '12345'
+		);
+		//password contain greater than 50 char
+		$test_data[][] = array(
+				'password' => 'weudhweuiryuiw4y5377846127361825376154yrhesjbfseufhiosuou897284647',
+				'token' => '',
+				'old_password' => '12345'
+		);
+		//password contain special char
+		$test_data[][] = array(
+				'password' => ' jhbfsh@#$@#%',
+				'token' => '',
+				'old_password' => '12345'
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+	
 }
