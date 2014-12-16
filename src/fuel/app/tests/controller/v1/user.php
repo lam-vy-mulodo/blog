@@ -395,12 +395,12 @@ class Test_Controller_V1_User extends TestCase {
 	public function test_validate_pass_notok($test_data,$data) {
 	
 		$test_data['token'] = $data['token'];
-
+        //print_r($test_data); die;
 		$method = 'PUT';
 		//add the user id into the link
 		$link = 'http://localhost/_blog/blog/src/v1/users/password';
 		$result = $this->init_curl($test_data, $method, $link);
-		
+		print_r($result);
 		//compare with error code 1004 for invalid data
 		$this->assertEquals('1004', $result['meta']['code']);
 	}
@@ -717,6 +717,123 @@ class Test_Controller_V1_User extends TestCase {
 				'password' => ' jhbfsh@#$@#%',
 				'token' => '',
 				'old_password' => '12345'
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+	
+	/**
+	 * use test search user by name ok, have user account return
+	 * method GET
+	 * link http://localhost/_blog/blog/src/v1/users/{name}
+	 * compare with code is 200, the number return greater than 0
+	 * @group search_user2
+	 * @dataProvider search_user_provider
+	 */
+
+	public function test_search_user_ok($test_data) {
+		//set method and link
+		$method = 'GET';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$result = $this->init_curl($test_data, $method, $link);		
+		//compare with error code 200
+		$this->assertEquals('200', $result['meta']['code']);
+		$this->assertGreaterThan(0, $result['meta']['result']); 
+	}
+	
+	/**
+	 * use test search user by name not ok,don't have any user return
+	 * method GET
+	 * link http://localhost/_blog/blog/src/v1/users/{name}
+	 * compare with code is 2005
+	 * @group search_user_notok2
+	 * @dataProvider search_notok_provider
+	 */
+	public function test_search_user_notok($test_data) {
+		$expected_desc = 'Not have any user for result.';
+		//set method and link
+		$method = 'GET';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$result = $this->init_curl($test_data, $method, $link);
+		//compare with error code 2004 , failure 1 for code 200 b/c id 30 exist in db
+		$this->assertEquals('2005', $result['meta']['code']);
+		//compare number of result > 0
+		$this->assertEquals($expected_desc, $result['meta']['description']);
+	}
+	/**
+	 * use test search user by name not ok, the keyqord use search is empty
+	 * method GET
+	 * link http://localhost/_blog/blog/src/v1/users/{name}
+	 * compare with code is 2005
+	 * compare msg return : The keyword search is empty. Please input it.
+	 * @group search_user_empty
+	 * 
+	 */
+	public function test_search_empty() {
+		//the code when search error is 2005.
+		//compare more the description return
+		$expected_desc = 'The keyword search is empty. Please input it.';
+		$test_data['name'] = '';
+		//set method and link
+		$method = 'GET';
+		//add the user id into the link
+		$link = 'http://localhost/_blog/blog/src/v1/users/';
+		$result = $this->init_curl($test_data, $method, $link);
+		//compare with error code 2004 , failure 1 for code 200 b/c id 30 exist in db
+		$this->assertEquals('2005', $result['meta']['code']);
+		//compare number of result > 0
+		$this->assertEquals($expected_desc, $result['meta']['description']);
+	}
+	/**
+	 * Define test data set
+	 * use for search user
+	 * @return array keyword
+	 */
+	public function search_user_provider() {
+		$test_data = array();
+	
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'thuy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'vy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'lam',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'nga77',
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+	/**
+	 * Define test data set
+	 * use for search user not ok
+	 * @return array keyword
+	 */
+	public function search_notok_provider() {
+		$test_data = array();
+	
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'hanh',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'shu',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'shuri',
 		);
 		//return array test data provider
 		return $test_data;

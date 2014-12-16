@@ -645,7 +645,7 @@ class Test_Model_V1_User extends TestCase {
 		//print_r($val['meta']['message']);
 		
 		$this->assertEquals(1004, $val['meta']['code']);
-		print_r($val);
+		//print_r($val);
 		
 	}
 	/**
@@ -725,8 +725,86 @@ class Test_Model_V1_User extends TestCase {
 		 
 	}
 	
+	/**
+	 * function to test search user have result 
+	 * input keyword 
+	 * compare with count row data result > 0
+	 * @group search_user_ok
+	 * @dataProvider search_provider
+	 */
+	public function test_search_user_ok($test_data) {
+		$name = $test_data['name'];
+		$result = $this->_user->search_user($name);
+		//assert row return greater 0
+		$this->assertGreaterThan(0, count($result)); 
+	}
+	/**
+	 * function to test search user not have any result
+	 * input keyword
+	 * compare with count row data result = 0
+	 * @group search_user_notok
+	 * @dataProvider search_notok_provider
+	 */
+	public function test_search_user_notok($test_data) {
+		$name = $test_data['name'];
+		$result = $this->_user->search_user($name);
+		//assert row return greater 0
+		$this->assertEquals(0, count($result));
+	}
+	/**
+	 * Define test data set
+	 * use for search user
+	 * @return array keyword
+	 */
+	public function search_provider() {
+		$test_data = array();
 	
-
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'thuy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'vy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'lam',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'nga77',
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+    
+	/**
+	 * Define test data set
+	 * use for search user not ok
+	 * @return array keyword
+	 */
+	public function search_notok_provider() {
+		$test_data = array();
+	
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'hanh',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'shu',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'shuri',
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+	
 
 
 
