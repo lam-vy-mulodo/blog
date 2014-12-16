@@ -394,12 +394,19 @@ class Controller_V1_User extends Controller_Rest {
 			//else return array error
 			
 			if(is_numeric($id) && $id > 0) {
-
-				//token exist in db , continue change password				
-				$result = User::change_password($password, $id, $old_password);
+				//validate new password
+				$val = User::validate_password($password);
+				if (true === $val) {
+					//validate password ok , continue change password
+					$result = User::change_password($id, $old_password, $password);
+					
+					//return the result
+					return $this->response($result);
+				} else {
+					//return the error
+					return $this->response($val);
+				}
 				
-				//return the result
-				return $this->response($result);
 				
 			} else {
 				
