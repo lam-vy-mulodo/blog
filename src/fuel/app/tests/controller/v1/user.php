@@ -749,9 +749,9 @@ class Test_Controller_V1_User extends TestCase {
 	 * link http://localhost/_blog/blog/src/v1/users/{name}
 	 * compare with code is 2005
 	 * @group search_user_notok2
-	 * @dataProvider search_notok_provider
+	 * @dataProvider search_not_match_provider
 	 */
-	public function test_search_user_notok($test_data) {
+	public function test_search_user_not_match($test_data) {
 		$expected_desc = 'Not have any user for result.';
 		//set method and link
 		$method = 'GET';
@@ -820,7 +820,7 @@ class Test_Controller_V1_User extends TestCase {
 	 * use for search user not ok
 	 * @return array keyword
 	 */
-	public function search_notok_provider() {
+	public function search_not_match_provider() {
 		$test_data = array();
 	
 		//the keyword contain 4 chars

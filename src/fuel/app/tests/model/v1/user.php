@@ -743,9 +743,9 @@ class Test_Model_V1_User extends TestCase {
 	 * input keyword
 	 * compare with count row data result = 0
 	 * @group search_user_notok
-	 * @dataProvider search_notok_provider
+	 * @dataProvider search_not_match_provider
 	 */
-	public function test_search_user_notok($test_data) {
+	public function test_search_user_not_match($test_data) {
 		$name = $test_data['name'];
 		$result = $this->_user->search_user($name);
 		//assert row return greater 0
@@ -785,7 +785,7 @@ class Test_Model_V1_User extends TestCase {
 	 * use for search user not ok
 	 * @return array keyword
 	 */
-	public function search_notok_provider() {
+	public function search_not_match_provider() {
 		$test_data = array();
 	
 		//the keyword contain 4 chars
