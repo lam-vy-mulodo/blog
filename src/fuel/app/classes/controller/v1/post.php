@@ -49,14 +49,16 @@ class Controller_V1_Post extends Controller_Rest {
 				return $this->response($rs);	
 			}
 		} else {
-			//return code is 1205 for token isn't exist in db
-			return array(
-					'meta' => array(
-							'code' => TOKEN_NOT_EXIST_ERROR ,
-							'description' => TOKEN_NOT_EXIST_MSG ,
-							'messages' => 'Access is denied '
-					),
-					'data' => null
+			//return token null error
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => TOKEN_NULL_ERROR,
+									'description' => TOKEN_NULL_DESC,
+									'messages' => TOKEN_NULL_MSG,
+							),
+							'data' => null,
+		 		)
 			);
 		}
 		
