@@ -30,14 +30,14 @@ class Test_Controller_V1_Post extends TestCase {
 	    
 	}
 	public static function setUpBeforeClass() {
-		self::$user = self::login_ok();
+		self::$user = self::do_login();
 	}
 	/**
 	* Cleanup test resource (CLASS LEVEL).
 	*/
 	public static function tearDownAfterClass() {
 		
-		self::logout(self::$user['token']);
+		self::do_logout(self::$user['token']);
 		self::$user = null;
 	}
 	/**
@@ -45,7 +45,7 @@ class Test_Controller_V1_Post extends TestCase {
 	 *
 	 * @return the data of user logged
 	 */
-	public static function login_ok() {
+	public static function do_login() {
 		//create data to test ok
 		$username = 'kenny4';
 		$password = '12345';
@@ -62,7 +62,7 @@ class Test_Controller_V1_Post extends TestCase {
 	 *
 	 * @return reset token in db
 	 */
-	public static function logout($token) {
+	public static function do_logout($token) {
 		
 		$rs = User::logout($token);
 	
