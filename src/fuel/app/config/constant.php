@@ -52,3 +52,10 @@ define('TOKEN_NULL_MSG', 'Token empty');
 //token not exist in db error code
 define('TOKEN_NOT_EXIST_ERROR', '1205');
 define('TOKEN_NOT_EXIST_MSG', 'Token is not exist in db.');
+
+/*
+ * Post error code
+ */
+define('POST_CREATE_ERROR', '1002');
+define('POST_CREATE_DESC', 'Input data invalid');
+
