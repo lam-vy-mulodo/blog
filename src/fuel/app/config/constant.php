@@ -58,4 +58,6 @@ define('TOKEN_NOT_EXIST_MSG', 'Token is not exist in db.');
  */
 define('POST_CREATE_ERROR', '1002');
 define('POST_CREATE_DESC', 'Input data invalid');
-
+define('POST_STATUS_ERROR', '2504');
+define('POST_STATUS_DESC', 'The status of post not change.');
+define('POST_STATUS_MSG', 'Update status post failed');
