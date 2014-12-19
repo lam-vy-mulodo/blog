@@ -22,7 +22,7 @@ return array(
 	//--------------------------POST--------------------------------
 	'(:version)/posts' => array(array('POST', new Route('$1/post/create'))),
 	//deactive a post
-    '(:version)/posts/:post_id/deactive' => array(array('PUT', new Route('$1/post/deactive_post'))),
+    '(:version)/posts/:post_id/inactive' => array(array('PUT', new Route('$1/post/inactive_post'))),
 	//deactive a post
 	'(:version)/posts/:post_id/active' => array(array('PUT', new Route('$1/post/active_post'))),
 );

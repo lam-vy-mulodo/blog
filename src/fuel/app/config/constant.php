@@ -61,3 +61,6 @@ define('POST_CREATE_DESC', 'Input data invalid');
 define('POST_STATUS_ERROR', '2504');
 define('POST_STATUS_DESC', 'The status of post not change.');
 define('POST_STATUS_MSG', 'Update status post failed');
+define('POST_ACTIVE_STATUS',1);
+define('POST_INACTIVE_STATUS',1);
+
