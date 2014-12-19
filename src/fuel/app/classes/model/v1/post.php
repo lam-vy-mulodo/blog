@@ -98,6 +98,7 @@ class Post extends \Orm\Model {
 			} else {
 				return false;
 			}
+			
 	    } catch(\Exception $ex) {
 	    	Log::error($ex->getMessage());
 	    	return $ex->getMessage();

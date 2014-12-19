@@ -67,12 +67,12 @@ class Controller_V1_Post extends Controller_Rest {
 	
 	/**
 	 * The method update status deactive for the post
-	 * @link http://localhost/v1/posts/deactive
+	 * @link http://localhost/v1/posts/inactive
 	 * @method : PUT
 	 * @access  public
 	 * @return  Response
 	 */
-	public function put_deactive_post() {
+	public function put_inactive_post() {
 		//check token
 		$token = Security::clean(Input::put('token'), $this->filters);
 		//check token is emtpy
@@ -92,8 +92,8 @@ class Controller_V1_Post extends Controller_Rest {
 			//check token valid
 			$rs = User::check_token($token);
 			if (is_numeric($rs) && $rs > 0) {
-				//set status for deactive is 0
-				$status = 0 ;
+				//set status for inactive is 0
+				$status = POST_INACTIVE_STATUS ;
 				$post_id = Security::clean($this->param('post_id'), $this->filters);
 				$author_id = $rs;
 				//call update status
@@ -154,7 +154,7 @@ class Controller_V1_Post extends Controller_Rest {
 			$rs = User::check_token($token);
 			if (is_numeric($rs) && $rs > 0) {
 				//set status for deactive is 0
-				$status = 1 ;
+				$status = POST_ACTIVE_STATUS ;
 				$post_id = Security::clean($this->param('post_id'), $this->filters);
 				$author_id = $rs;
 				//call update status
