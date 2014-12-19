@@ -63,4 +63,9 @@ define('POST_STATUS_DESC', 'The status of post not change.');
 define('POST_STATUS_MSG', 'Update status post failed');
 define('POST_ACTIVE_STATUS',1);
 define('POST_INACTIVE_STATUS',0);
+//update data post
+define('POST_UPDATE_ERROR', '2502');
+define('POST_UPDATE_DESC', 'The post don\'t have any change.');
+define('POST_UPDATE_MSG', 'Update post failed');
+
 
