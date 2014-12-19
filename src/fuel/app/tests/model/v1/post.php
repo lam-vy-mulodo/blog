@@ -170,7 +170,7 @@ class Test_Model_V1_Post extends TestCase {
 		$test_data[][] = array(
 			'post_id' => '17',
 			'author_id' => '89',
-			'status'	=>	'0',
+			'status'	=>	POST_INACTIVE_STATUS,
 			'title' => 'title for unit testing in controller',
 			'created_at' => '1418798556',
 			'modified_at' => '1418798556'
@@ -180,7 +180,7 @@ class Test_Model_V1_Post extends TestCase {
 		$test_data[][] = array(
 				'post_id' => '17',
 				'author_id' => '89',
-				'status'	=>	'1',
+				'status'	=>	POST_ACTIVE_STATUS,
 				'title' => 'title for unit testing in controller',
 				'created_at' => '1418798556',
 				'modified_at' => '1418798556'
@@ -214,21 +214,21 @@ class Test_Model_V1_Post extends TestCase {
 		$test_data[][] = array(
 				'post_id' => '6',
 				'author_id' => '30',
-				'status'	=>	'1'
+				'status'	=>	POST_ACTIVE_STATUS
 		);
 	
 		//inactive post was inactived
 		$test_data[][] = array(
 				'post_id' => '1',
 				'author_id' => '30',
-				'status'	=>	'0',
+				'status'	=>	POST_INACTIVE_STATUS,
 				
 		);
 		//active the post when author id wrong
 		$test_data[][] = array(
 				'post_id' => '1',
 				'author_id' => '31',//true is 30
-				'status'	=>	'1',
+				'status'	=>	POST_ACTIVE_STATUS,
 		
 		);
 		return $test_data;

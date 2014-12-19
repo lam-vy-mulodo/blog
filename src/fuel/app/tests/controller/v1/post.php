@@ -185,7 +185,7 @@ class Test_Controller_V1_Post extends TestCase {
 		$test_data = array(
 				'post_id' => '17',
 				'author_id' => '89',
-				'status' => '0',
+				'status' => POST_INACTIVE_STATUS,
 				'title' => 'title for unit testing in controller',
 				'created_at' => '1418798556',
 				'modified_at' => '1418798556'
@@ -239,7 +239,7 @@ class Test_Controller_V1_Post extends TestCase {
 		$test_data = array(
 				'post_id' => '17',
 				'author_id' => '89',
-				'status' => '1',
+				'status' => POST_ACTIVE_STATUS,
 				'title' => 'title for unit testing in controller',
 				'created_at' => '1418798556',
 				'modified_at' => '1418798556'
