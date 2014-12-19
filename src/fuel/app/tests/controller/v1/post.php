@@ -38,7 +38,7 @@ class Test_Controller_V1_Post extends TestCase {
 	public static function tearDownAfterClass() {
 		
 		self::do_logout(self::$user['token']);
-		self::$user = null;
+	    self::$user = null;
 	}
 	/**
 	 * funtion to test login ok
@@ -170,5 +170,117 @@ class Test_Controller_V1_Post extends TestCase {
 		// return response
 		//print_r($test_data); die;
 		return $res;
+	}
+	
+	/**
+	 * use test inactive the post is  ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}/inactive
+	 * compare with code is 200, the data expected
+	 * @group update_inactive
+	 * 
+	 */
+	public function test_inactive_post_ok() {
+		//set expected data
+		$test_data = array(
+				'post_id' => '17',
+				'author_id' => '89',
+				'status' => POST_INACTIVE_STATUS,
+				'title' => 'title for unit testing in controller',
+				'created_at' => '1418798556',
+				'modified_at' => '1418798556'
+		);
+		//set the token param
+		$params['token'] = self::$user['token'];
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$test_data['post_id'].'/inactive';
+		$data = $this->init_curl($params, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals('200', $data['meta']['code']);
+		//compare data return
+		$this->assertEquals($test_data['post_id'], $data['data']['id']);
+		$this->assertEquals($test_data['title'], $data['data']['title']);
+		$this->assertEquals($test_data['status'], $data['data']['status']);
+		$this->assertEquals($test_data['created_at'], $data['data']['created_at']);
+		$this->assertEquals($test_data['modified_at'], $data['data']['modified_at']);
+		return $test_data['post_id'];
+	}
+	/**
+	 * use test inactive the post is  notok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}/inactive
+	 * compare with code is 2504 
+	 * @group update_inactive
+	 * @depends test_inactive_post_ok
+	 */
+	public function test_inactive_post_notok($id) {
+		//set the token param
+		$params['token'] = self::$user['token'];
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$id.'/inactive';
+		$data = $this->init_curl($params, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals('2504', $data['meta']['code']);
+		
+		
+	}
+	/**
+	 * use test active the post is  ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}/active
+	 * compare with code is 200, the data expected
+	 * @group update_active
+	 *
+	 */
+	public function test_active_post_ok() {
+		//set expected data
+		$test_data = array(
+				'post_id' => '17',
+				'author_id' => '89',
+				'status' => POST_ACTIVE_STATUS,
+				'title' => 'title for unit testing in controller',
+				'created_at' => '1418798556',
+				'modified_at' => '1418798556'
+		);
+		//set the token param
+		$params['token'] = self::$user['token'];
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$test_data['post_id'].'/active';
+		$data = $this->init_curl($params, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals('200', $data['meta']['code']);
+		//compare data return
+		$this->assertEquals($test_data['post_id'], $data['data']['id']);
+		$this->assertEquals($test_data['title'], $data['data']['title']);
+		$this->assertEquals($test_data['status'], $data['data']['status']);
+		$this->assertEquals($test_data['created_at'], $data['data']['created_at']);
+		$this->assertEquals($test_data['modified_at'], $data['data']['modified_at']);
+		//return post id for test active is not ok
+		//bc the post want to active was actived
+		return $test_data['post_id'];
+	}
+	
+	/**
+	 * use test inactive the post is  notok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}/active
+	 * compare with code is 2504
+	 * @group update_active
+	 * @depends test_active_post_ok
+	 */
+	public function test_active_post_notok($id) {
+		//set the token param
+		$params['token'] = self::$user['token'];
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$id.'/active';
+		$data = $this->init_curl($params, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals('2504', $data['meta']['code']);
+	
+	
 	}
 }
