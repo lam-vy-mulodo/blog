@@ -21,7 +21,10 @@ return array(
 	'(:version)/users(:name)?' =>  array(array('GET', new Route('$1/user/search_user'))), 
 	//--------------------------POST--------------------------------
 	'(:version)/posts' => array(array('POST', new Route('$1/post/create'))),
-	
+	//deactive a post
+    '(:version)/posts/:post_id/inactive' => array(array('PUT', new Route('$1/post/inactive_post'))),
+	//deactive a post
+	'(:version)/posts/:post_id/active' => array(array('PUT', new Route('$1/post/active_post'))),
 );
 //the routes for use function get_user_info($id)
 //'(:version)/users/(:num)' => array( array( 'GET', new Route( '$1/user/user_info/$3' ))) ,

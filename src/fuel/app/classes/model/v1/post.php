@@ -74,4 +74,34 @@ class Post extends \Orm\Model {
 		
 		
 	}
+	
+   /*
+	* method use to update the status of post
+	* status 1 is active, 0 is de-active
+	* @param input data  include post_id,status, author_id
+	* @return array data of the post updated
+	*/
+	public static function update_status($post_id, $status, $author_id) {
+		try {
+			//update
+			$row = DB::update('post')->value('status', $status)->where('id', $post_id)->where('author_id', $author_id)->execute();
+			//check row affected
+			// > 0 is ok
+			
+			if ($row > 0) {
+				//get info of post
+				$data = DB::select('id', 'title', 'status', 'created_at', 'modified_at')
+				          ->from('post')
+				          ->where('id', '=', $post_id)
+				          ->execute();
+				return $data[0];
+			} else {
+				return false;
+			}
+			
+	    } catch(\Exception $ex) {
+	    	Log::error($ex->getMessage());
+	    	return $ex->getMessage();
+	    }
+	}
 }
