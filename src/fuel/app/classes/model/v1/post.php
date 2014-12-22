@@ -173,7 +173,7 @@ class Post extends \Orm\Model {
 		$entry = DB::delete('post')->where('id', '=', $post_id)->where('author_id', '=', $author_id)->execute();
 		//check entry > 0 = delete success
 		//entry is empty  = delete unsuccess
-		if (is_numeric($entry) && $entry > 0) {
+		if ($entry == 1) {
 			$rs = array(
 							'meta' => array(
 									'code' => SUSSCESS_CODE,
