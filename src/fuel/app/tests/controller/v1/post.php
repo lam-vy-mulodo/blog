@@ -283,4 +283,115 @@ class Test_Controller_V1_Post extends TestCase {
 	
 	
 	}
+	
+	/**
+	 * use test to edit the post is ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}
+	 * compare with code is 200, the data return with the data input
+	 * @group edit_post_ok
+	 * 
+	 */
+	public function test_edit_post_ok() {
+		//set the data param
+		$data = array(
+			'token' => self::$user['token'],
+			'post_id' => '25',
+			'title' => 'Good luck!',
+			'content' => 'Lorem Ipsum has been the industry...',
+		);
+		
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$data['post_id'];
+		$rs = $this->init_curl($data, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals(200, $rs['meta']['code']);
+		$this->assertEquals($data['post_id'], $rs['data']['id']);
+		$this->assertEquals($data['title'], $rs['data']['title']);
+		$this->assertEquals($data['content'], $rs['data']['content']);
+	
+	
+	}
+	
+	/**
+	 * use test to edit the post is not ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}
+	 * compare with code is 2502, the author id input not match with author of post
+	 * @group edit_post_notok
+	 *
+	 */
+	public function test_edit_post_notok() {
+		//set the data param
+		$data = array(
+				'token' => self::$user['token'],
+				'post_id' => '1',
+				'title' => 'Good luck!',
+				'content' => 'Lorem Ipsum has been the industry...',
+		);
+	
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$data['post_id'];
+		$rs = $this->init_curl($data, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals(2502, $rs['meta']['code']);
+		
+	}
+	/**
+	 * use test to edit the post is validated not ok
+	 * method PUT
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}
+	 * compare with code is 1002
+	 * @group edit_post_notok
+	 * @dataProvider edit_post_val_notok_provider
+	 */
+	public function test_edit_post_val_notok($test_data) {
+		//set the data param
+		$test_data['token'] = self::$user['token'];
+	
+		//set method and link
+		$method = 'PUT';
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$test_data['post_id'];
+		$rs = $this->init_curl($test_data, $method, $link);
+		//compare with the result and expected data
+		$this->assertEquals(1002, $rs['meta']['code']);
+	
+	}
+	/**
+	 * Define test data for test validate edit a post is error
+	 *
+	 * @return array Test data
+	 */
+	public function edit_post_val_notok_provider() {
+		$test_data = array();
+		//the title is empty
+	
+		$test_data[][] = array(
+				'post_id' => '25',
+				'title' => '',
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+		//content is empty
+		$test_data[][] = array(
+				'post_id' => '25',
+				'title' => 'Let\'s it go ',
+				'content' => ''
+		);
+		//the title is more 255 char
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$title = '';
+		for ($i=0; $i < 5; $i++) {
+			$title .= $characters;
+		}
+	
+		$test_data[][] = array(
+				'post_id' => '25',
+				'title' => $title,
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+	
+		return $test_data;
+	}
 }
