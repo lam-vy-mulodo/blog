@@ -25,8 +25,10 @@ return array(
     '(:version)/posts/:post_id/inactive' => array(array('PUT', new Route('$1/post/inactive_post'))),
 	//deactive a post
 	'(:version)/posts/:post_id/active' => array(array('PUT', new Route('$1/post/active_post'))),
-	//update a post
-	 '(:version)/posts/:post_id' => array(array('PUT', new Route('$1/post/update_post'))),		
+	//update a post, delete post
+	'(:version)/posts/:post_id' => array(array('PUT', new Route('$1/post/update_post')), array('DELETE', new Route('$1/post/post'))),
+	
+	
 );
 //the routes for use function get_user_info($id)
 //'(:version)/users/(:num)' => array( array( 'GET', new Route( '$1/user/user_info/$3' ))) ,

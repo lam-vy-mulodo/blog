@@ -245,4 +245,45 @@ class Controller_V1_Post extends Controller_Rest {
 		}
 		
 	}
+	
+	/**
+	 * The method delete a post
+	 * @link http://localhost/v1/posts/{post_id}
+	 * @method : DELETE
+	 * @access  public
+	 * @return  Response
+	 */
+	public function delete_post() {
+		//get the post id
+		$post_id = $this->param('post_id');
+		$token = Security::clean(Input::delete('token'), $this->filters);
+		//check token empty
+		if (empty($token)) {
+			//error code
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => TOKEN_NULL_ERROR,
+									'description' => TOKEN_NULL_DESC,
+									'messages' => TOKEN_NULL_MSG,
+							),
+							'data' => null,
+					)
+			);
+		} else {
+			$rs = User::check_token($token);
+			//check user id return 
+			if (is_numeric($rs) && $rs > 0) {
+				$author_id = $rs;
+				$result = Post::delete_post($post_id, $author_id);
+				//response result
+				return $this->response($result);
+			} else {
+				//error token is not exist db
+				return $this->response($rs) ;
+			}
+		}
+		
+		
+	}
 }
