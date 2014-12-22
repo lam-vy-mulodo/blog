@@ -204,7 +204,7 @@ class Test_Model_V1_Post extends TestCase {
 		
 	}
 	/**
-	 * Define test data for check login not ok
+	 * Define test data for test update status of post
 	 *
 	 * @return array Test data
 	 */
@@ -231,6 +231,109 @@ class Test_Model_V1_Post extends TestCase {
 				'status'	=>	POST_ACTIVE_STATUS,
 		
 		);
+		return $test_data;
+	}
+	/**
+	 * funtion to test update post is not ok
+	 * validate data title, content is error
+	 * @param : data includes post_id, author_id, title and content
+	 * compare with false
+	 * @group edit_post_notok
+	 * @dataProvider edit_post_val_notok_provider
+	 */
+	public function test_validate_edit_post($test_data) {
+		//run the function edit post in model
+		$rs = Post::update_post($test_data);
+		//assert with false for error validate
+		$this->assertFalse($rs);
+		
+	}
+	
+	/**
+	 * funtion to test update post ok
+	 * @param : data includes post_id, author_id, title and content
+	 * compare with code return is 200
+	 * @group edit_post_ok
+	 */
+	public function test_edit_post_ok() {
+		//create data
+		
+		$data = array(
+				'post_id' => '1',
+				'author_id' => '30',
+				'title' => 'Good luck !',
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+		//run the function edit post in model
+		$rs = Post::update_post($data);
+		//assert with result return
+		$this->assertEquals(200, $rs['meta']['code']);
+		$this->assertEquals($data['post_id'], $rs['data']['id']);
+		$this->assertEquals($data['title'], $rs['data']['title']);
+		$this->assertEquals($data['content'], $rs['data']['content']);
+	    
+	}
+	
+	/**
+	 * funtion to test update post not ok
+	 * the param author id is not match with author of post
+	 * @param : data includes post_id, author_id, title and content
+	 * compare with code return is 2502 return
+	 * @group edit_post_notok
+	 */
+	public function test_edit_post_notok() {
+		//create data
+	
+		$data = array(
+				'post_id' => '1',
+				'author_id' => '89',
+				'title' => 'Good luck !',
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+		//run the function edit post in model
+		$rs = Post::update_post($data);
+		//assert with result return
+		$this->assertEquals(2502, $rs['meta']['code']);
+		
+		 
+	}
+	
+	/**
+	 * Define test data for test validate edit a post is error
+	 *
+	 * @return array Test data
+	 */
+	public function edit_post_val_notok_provider() {
+		$test_data = array();
+		//the title is empty
+		
+		$test_data[][] = array(
+				'post_id' => '1',
+				'author_id' => '30',
+				'title' => '',
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+		//content is empty
+		$test_data[][] = array(
+				'post_id' => '1',
+				'author_id' => '30',
+				'title' => 'Let\'s it go ',
+				'content' => ''
+		);
+		//the title is more 255 char
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$title = '';
+		for ($i=0; $i < 5; $i++) {
+			$title .= $characters;
+		}
+		
+		$test_data[][] = array(
+				'post_id' => '1',
+				'author_id' => '30',
+				'title' => $title,
+				'content' => 'Lorem Ipsum has been the industry...'
+		);
+	
 		return $test_data;
 	}
 }
