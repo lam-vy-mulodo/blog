@@ -186,4 +186,63 @@ class Controller_V1_Post extends Controller_Rest {
 			}
 		}
 	}
+	
+	public function put_update_post() {
+		//token
+		$token = Security::clean(Input::put('token'), $this->filters);
+		if (empty($token)) {
+			//error null token
+			return $this->response(
+					array(
+							'meta' => array(
+									'code' => TOKEN_NULL_ERROR,
+									'description' => TOKEN_NULL_DESC,
+									'messages' => TOKEN_NULL_MSG,
+							),
+							'data' => null,
+					)
+			);
+		} else {
+			
+			//check token valid
+			$rs = User::check_token($token);
+			
+			if (is_numeric($rs) && $rs > 0) {
+				//set data to update
+				$data = array ();
+				$data['title'] = Security::clean(Input::put('title'), $this->filters);
+				$data['content'] = Security::clean(Input::put('content'), $this->filters);
+				$data['post_id'] = $this->param('post_id');
+				$data['author_id'] = $rs;
+				//call update
+				$result = Post::update_post($data);
+				//check success update
+				if(false !== $result) {
+					//return data
+					return $this->response($result);
+					
+				} else {
+			    	
+					//error about validate update
+					return $this->response(
+							array(
+							'meta' => array(
+									'code' => POST_CREATE_ERROR,
+									'desc' => POST_CREATE_DESC,
+									'messages' => array(
+											array('message' => 'The title and content the post are required'),
+											array('message' => 'The title not contain more than 255 characters')
+									)),
+							'data' => null
+					));
+				}
+				
+				
+			} else {
+				//return error token invalid
+				return $this->response($rs);
+			}
+		}
+		
+	}
 }

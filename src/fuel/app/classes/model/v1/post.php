@@ -104,4 +104,62 @@ class Post extends \Orm\Model {
 	    	return $ex->getMessage();
 	    }
 	}
+	
+   /*
+	* method use to update the title ,content of post
+	* @param input data  include title, content and post_id
+	* @return array data of the post updated
+	*/
+	
+	public static function update_post($data) {
+		//first, validate title and content data
+		if (!empty($data['title']) && !empty($data['content'])
+				&& strlen($data['title'] <= 255)) {
+					//set the time created and first modified
+					$time = time();
+					$data['modified_at'] = $time;
+					//update
+					//call update
+					$row = DB::update('post')->set(
+							array(
+									'title' => $data['title'],
+									'content' => $data['content'],
+									'modified_at' => $time
+							))->where('id', $data['post_id'])->where('author_id', $data['author_id'])->execute();
+					if ($row > 0) {	
+						//get data from user id
+						$rs = DB::select('id', 'title', 'content', 'created_at', 'modified_at')
+						->from('post')
+						->where('id', '=', $data['post_id'])
+						->execute();
+						
+						//return data of the post
+						return array(
+								'meta' => array(
+										'code' => SUSSCESS_CODE,
+										'messages' => 'Update post success!'
+								),
+								'data' =>$rs[0]
+								);
+					} else {
+						//not row affected
+						//update failed, not any row change
+					return array(
+							'meta' => array(
+									'code' => POST_UPDATE_ERROR,
+									'desc' => POST_UPDATE_DESC,
+									'messages' => POST_UPDATE_MSG
+							),
+							'data' => null
+					        );
+						
+					}
+			   
+			   
+				} else {
+					//return false for validate error
+					return false;
+		
+				}
+	}
 }
