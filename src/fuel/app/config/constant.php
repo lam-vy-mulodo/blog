@@ -68,4 +68,7 @@ define('POST_UPDATE_ERROR', '2502');
 define('POST_UPDATE_DESC', 'The post don\'t have any change.');
 define('POST_UPDATE_MSG', 'Update post failed');
 
-
+//delete post
+define('POST_DELETE_ERROR', '2503');
+define('POST_DELETE_DESC', 'The post not exist or access is denied.');
+define('POST_DELETE_MSG', 'Delete post failed.');

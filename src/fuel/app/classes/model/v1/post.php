@@ -162,4 +162,36 @@ class Post extends \Orm\Model {
 		
 				}
 	}
+	
+   /*
+	* method use to delete the post by id
+	* @param input post_id
+	* @return the code 200 when success, 2503 when error
+	*/
+	public static function delete_post($post_id, $author_id) {
+		//query delete
+		$entry = DB::delete('post')->where('id', '=', $post_id)->where('author_id', '=', $author_id)->execute();
+		//check entry > 0 = delete success
+		//entry is empty  = delete unsuccess
+		if ($entry == 1) {
+			$rs = array(
+							'meta' => array(
+									'code' => SUSSCESS_CODE,
+									'messages' => 'Delete post success!'
+							),
+							'data' => null
+					        );
+		} else {
+			$rs = array(
+					'meta' => array(
+							'code' => POST_DELETE_ERROR,
+							'description' => POST_DELETE_DESC,
+							'messages' => POST_DELETE_MSG
+					),
+					'data' => null
+			);
+		}
+		
+		return $rs;
+	} 
 }
