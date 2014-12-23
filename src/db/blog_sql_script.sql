@@ -48,4 +48,4 @@ post_id int(11) not null
 /***********************FK key************************/
 alter table post add foreign key(author_id) references user(id);
 alter table comment add foreign key(author_id) references user(id);
-alter table comment add foreign key(post_id) references post(id);
+alter table comment add foreign key(post_id) references post(id) on delete cascade;
