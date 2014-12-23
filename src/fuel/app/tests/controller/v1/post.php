@@ -92,6 +92,7 @@ class Test_Controller_V1_Post extends TestCase {
 		$this->assertEquals(200, $rs['meta']['code']);
 		$this->assertGreaterThan(0, $rs['data']['id']);		
 		$this->assertEquals($test_data['title'], $rs['data']['title']);
+		return $rs['data'];
 	}
 	/**
 	 * use test create the post is not ok
@@ -393,5 +394,62 @@ class Test_Controller_V1_Post extends TestCase {
 		);
 	
 		return $test_data;
+	}
+	
+	/**
+	 * use test to delete post not ok
+	 * method DELETE
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}
+	 * compare with code is 2503
+	 * @group delete_post_notok
+	 * @dataProvider delete_provider
+	 */
+	public function test_delete_post_notok($test_data) {
+		//add token
+		$test_data['token'] = self::$user['token'];
+		//link
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$test_data['post_id'];
+		$method = 'DELETE';
+		$rs = $this->init_curl($test_data, $method, $link);		
+		//assert with error 2503
+		$this->assertEquals('2503', $rs['meta']['code']);
+	}
+	
+	/**
+	 * use test to delete post ok
+	 * method DELETE
+	 * link http://localhost/_blog/blog/src/v1/posts/{post_id}
+	 * compare with code is 200
+	 * @group delete_post_ok
+	 * @depends test_create_post_ok
+	 */
+	public function test_delete_post_ok($data) {
+		//add token
+		$test_data['token'] = self::$user['token'];
+		
+		//link
+		$link = 'http://localhost/_blog/blog/src/v1/posts/'.$data['id'];
+		$method = 'DELETE';
+		$rs = $this->init_curl($test_data, $method, $link);
+		//assert with error 2503
+		$this->assertEquals('200', $rs['meta']['code']);
+	}
+	/**
+	 * Define test data for test delete post
+	 *
+	 * @return array Test data
+	 */
+	public function delete_provider() {
+		$data = array();
+	
+		//author_id not match
+		$data[][] = array(
+				'post_id' => '1',
+		);
+		//post id not exist
+		$data[][] = array(
+				'post_id' => '21',
+		);
+		return $data;
 	}
 }

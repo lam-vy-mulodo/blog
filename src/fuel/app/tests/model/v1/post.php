@@ -87,7 +87,7 @@ class Test_Model_V1_Post extends TestCase {
 		$this->assertGreaterThan(0, $rs['data']['id']);
 		$this->assertEquals($test_data['author_id'], $rs['data']['author_id']);
 		$this->assertEquals($test_data['title'], $rs['data']['title']);
-		
+		return $rs['data'];
 	}
 	
 	/**
@@ -335,5 +335,58 @@ class Test_Model_V1_Post extends TestCase {
 		);
 	
 		return $test_data;
+	}
+
+	/**
+	 * funtion to test delete post not ok
+	 * the param author id is not match with author of post
+	 * or the post not exist
+	 * @param : data includes post_id, author_id
+	 * compare with code return is 2503 return
+	 * @group delete_post_notok
+	 * @dataProvider delete_provider
+	 */
+	public function test_delete_post_notok($data) {
+		
+		//run the function edit post in model
+		$rs = Post::delete_post($data['post_id'], $data['author_id']);
+		//assert with result return
+		$this->assertEquals(2503, $rs['meta']['code']);
+		
+	}
+	/**
+	 * funtion to test delete post ok
+	 * @param : data includes post_id, author_id
+	 * compare with code return is 200
+	 * @group delete_post_notok
+	 * @depends test_create_post_ok
+	 */
+	public function test_delete_post_ok($data) {
+	
+		//run the function edit post in model
+		$rs = Post::delete_post($data['id'], $data['author_id']);
+		//assert with result return
+		$this->assertEquals(200, $rs['meta']['code']);
+	
+	}
+	/**
+	 * Define test data for test delete post
+	 *
+	 * @return array Test data
+	 */
+	public function delete_provider() {
+		$data = array();
+	
+		//author_id not match	
+		$data[][] = array(
+				'post_id' => '1',
+				'author_id' => '89',				
+		);
+		//post id not exist
+		$data[][] = array(
+				'post_id' => '21',
+				'author_id' => '89',
+		);
+		return $data;
 	}
 }
