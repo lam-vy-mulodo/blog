@@ -33,6 +33,11 @@ class Test_Model_V1_User extends TestCase {
 	public function tearDown() {
 		
 		unset($this->_user);
+		
+		
+	}
+	public static function tearDownAfterClass() {
+		
 	}
 	
 	/**
@@ -45,10 +50,10 @@ class Test_Model_V1_User extends TestCase {
 		$User = $this->_user;		
 		$val = $User::validate_user($data);						
 		//print_r($val['meta']['message']);
-		if( $val!=1 ) {
-		$this->assertEquals(1001,$val['meta']['code']);
+		if($val != 1) {
+		$this->assertEquals(1001, $val['meta']['code']);
 		} else {
-			$this->assertEquals(true,$val);
+			$this->assertEquals(true, $val);
 		}
 		
 	}
@@ -61,9 +66,9 @@ class Test_Model_V1_User extends TestCase {
 	 */
     public function test_check_user_exist_ok($testdata = 'thuyvy') {
     	
-    	$rs = $this->_user->check_user_exist( $testdata ) ;
-    	//var_dump($rs) ; die;
-    	$this->assertTrue( $rs ); 
+    	$rs = $this->_user->check_user_exist($testdata);
+    	//var_dump($rs); die;
+    	$this->assertTrue($rs); 
     }
     
     /**
@@ -73,9 +78,9 @@ class Test_Model_V1_User extends TestCase {
      */
     public function test_check_user_not_exist($testdata = 'thuyvy1010') {
     	 
-    	$rs = $this->_user->check_user_exist( $testdata ) ;
-    	//var_dump($rs) ; die;
-    	$this->assertEquals($rs,false);
+    	$rs = $this->_user->check_user_exist($testdata);
+    	//var_dump($rs); die;
+    	$this->assertEquals($rs, false);
     }
     
     /**
@@ -89,18 +94,39 @@ class Test_Model_V1_User extends TestCase {
     	// data to insert
     	$data = array(
     		'username' => 'thuyvy99',
-    		'password' => Auth::hash_password('12345') ,
-    		'lastname' => 'lam' ,
-    		'firstname' => 'vy' ,
+    		'password' => Auth::hash_password('12345'),
+    		'lastname' => 'lam',
+    		'firstname' => 'vy',
     		'email' => 'lam.vy@mulodo.com',
-    		'created_at' => $time ,
-    		'modified_at' => $time ,
+    		'created_at' => $time,
+    		'modified_at' => $time,
     	);
     	
-    	$user_id = $this->_user->create_user($data) ;    	
+    	$user_id = $this->_user->create_user($data);    	
     	    	
-    	$this->assertGreaterThan(0,$user_id);
-    	
+    	$this->assertGreaterThan(0, $user_id);
+    	//delete user have been created to test username is not exist in db
+    	//user data can insert when username not exist
+    	self::remove_user($user_id);
+    }
+    
+    /**
+     * reset username - it will not exist to test create
+     * remove user account have been created when call test create user
+     */
+    
+    public static function remove_user($user_id) {
+    
+    	// try catch to execute query db
+    	try {
+    		$query = DB::delete('user')->where('id', ' = ', $user_id)->execute();
+    			
+    		return ($query == 1) ? true : false;
+    	} catch (Exception $ex) {
+    
+    		Log::error($ex->getMessage());
+    		return $ex->getMessage();
+    	}
     }
     
     /**
@@ -120,25 +146,82 @@ class Test_Model_V1_User extends TestCase {
     			'firstname' => 'vy' ,
     			'email' => 'lam.vy@mulodo.com',
     			'created_at' => '2014-11-26',
-    			'modified_at' => '2014-11-26'
+    			'modified_at' => '2014-11-26',
     			
     	);    	   	
     	
-    	$result = $this->_user->create_token($data['username'], $data['password']) ;
-    	
+    	$result = $this->_user->create_token($data['username'], $data['password']);
+    	//print_r($result); die;
     	//compare expected data with result data 
-    	$this->assertEquals($data['id'],$result['id']);
-    	$this->assertEquals($data['username'],$result['username']);
-    	$this->assertEquals($data['email'],$result['email']);
-    	$this->assertEquals($data['lastname'],$result['lastname']);
-    	$this->assertEquals($data['firstname'],$result['firstname']);
-    	$this->assertEquals($data['created_at'],$result['created_at']);
-    	$this->assertEquals($data['modified_at'],$result['modified_at']);
-    	$this->assertEquals(40,strlen($result['token'])) ;
+    	$this->assertEquals($data['id'], $result['id']);
+    	$this->assertEquals($data['username'], $result['username']);
+    	$this->assertEquals($data['email'], $result['email']);
+    	$this->assertEquals($data['lastname'], $result['lastname']);
+    	$this->assertEquals($data['firstname'], $result['firstname']);
+    	$this->assertEquals($data['created_at'], $result['created_at']);
+    	$this->assertEquals($data['modified_at'], $result['modified_at']);
+    	$this->assertEquals(40, strlen($result['token']));
     	
     }
    
-
+    /**
+     * function to test login ok
+     * @group login_ok
+     *
+     */
+    public function test_login_ok() {
+    	//create data to test ok
+    	$username = 'thuyvy';
+    	$password = '12345';
+    	$rs = $this->_user->login($username, $password);
+    	//compare id return is greater than 0 is login ok
+    	
+    	$this->assertGreaterThan(0, $rs['id']);
+    	 
+    }
+    
+    
+    /**
+     * function to test login not ok
+     * @group login_not_ok
+     * @dataProvider login_not_provider
+     */
+    public function test_login_not_ok($test_data) {
+    	//create data to test ok
+    	 
+    	$username = $test_data['username'];
+    	$password = $test_data['password'];
+    	$rs = $this->_user->login($username, $password);
+    	//compare boolean false  to check login not ok
+    	$this->assertEquals(false, $rs);
+    }
+    
+    /**
+     * Define test data for check login not ok
+     *
+     * @return array Test data
+     */
+    
+    public function login_not_provider() {
+    	$test_data = array();
+    	//username not exist
+    	$test_data[][] = array(
+    			'username' => 'thuyvy88',
+    			'password' => '1234'
+    	);
+    	$test_data[][] = array(
+    			'username' => 'lam.vy',
+    			'password' => '1234'
+    	);
+    	//test for sql injection 
+    	$test_data[][] = array(
+    			'username' => 'username` or 1 = 1 -- ',
+    			'password' => '1234'
+    	);
+    	 
+    	return $test_data;
+    }
+    
     /**
      * Define test data set
      *
@@ -152,7 +235,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//Null password
     	$test_data[][] = array(
@@ -160,7 +243,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	// Null email
     	$test_data[][] = array(
@@ -168,7 +251,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => ''
+    			'email' => '',
     	);
     	// Null  lastname
     	$test_data[][] = array(
@@ -176,7 +259,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => '',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	// Null firstname
     	$test_data[][] = array(
@@ -184,7 +267,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => '',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//username contain at least 5 characters
     	$test_data[][] = array(
@@ -192,7 +275,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//password contain at least 5 characters
     	$test_data[][] = array(
@@ -200,7 +283,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '123',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//username contain special characters
     	$test_data[][] = array(
@@ -208,7 +291,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//password contain special characters
     	$test_data[][] = array(
@@ -216,7 +299,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345#$@%',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//username contain more 50 characters
     	$test_data[][] = array(
@@ -224,7 +307,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//username contain more 50 characters
     	$test_data[][] = array(
@@ -232,7 +315,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     	//email not correct format
     	$test_data[][] = array(
@@ -240,7 +323,7 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy.mulodo.com'
+    			'email' => 'lam.vy.mulodo.com',
     	);
     	//data valid
     	$test_data[][] = array(
@@ -248,11 +331,500 @@ class Test_Model_V1_User extends TestCase {
     			'password' => '12345',
     			'firstname' => 'vy',
     			'lastname' => 'Lam',
-    			'email' => 'lam.vy@mulodo.com'
+    			'email' => 'lam.vy@mulodo.com',
     	);
     
     	return $test_data;
     }
     
+    /**
+     * function to test check token exist ok in db
+     * compare with boolean true
+     * @group check_token
+     */
+    public function test_token_exist_ok() {
+    	//first is login to create token in db 
+    	//get token return to test check    	
+    	$username = 'thuyvy';
+    	$password = '12345';
+    	$data = $this->_user->login($username, $password);
+    	$token = $data['token'];
+    	
+    	$result = User::check_token($token);
+    	//compare result return with id of username vy (30)- token exist
+    	
+    	$this->assertEquals(30, $result);
+    	
+    	
+    }
     
+    /**
+     * function to test check token is not exist in db
+     * compare with return code is 1205
+     * @group check_token_notok
+     * @dataProvider token_provider
+     */
+    public function test_token_not_exist($test_data) {
+    	$rs = User::check_token($test_data);
+    	//compare with code return is 1205 for not exist token
+    	$this->assertEquals('1205', $rs['meta']['code']);
+    	
+    }
+    /**
+     * Define test data set
+     * create token by use sha1
+     * @return array Test data
+     */
+    public function token_provider() {
+    	$test_data = array();
+    	//loop for auto create
+    	for ($i = 0; $i < 10; $i++) {
+    		$test_data[][] = array('token' => sha1(time()));
+    	}
+    	
+    	return $test_data;
+    }
+    /**
+     * function use to test logout ok
+     * @param input is token was create from login function
+     * compare number rows affected greate than 0
+     * @group logout
+     */
+    public function test_logout() {
+    	//first is login to create token in db 
+    	//get token return to test check    	
+    	$username = 'thuyvy';
+    	$password = '12345';
+    	$data = $this->_user->login($username, $password);
+    	$token = $data['token'];
+    	
+    	//call logout and compare with row affected
+    	$row = User::logout($token);
+    	$this->assertGreaterThan(0, $row);
+    	
+    	//call test token not exist in db is logout ok
+    	$result = User::check_token($token);
+    	//compare status with error code 1205
+    	$this->assertEquals('1205', $result['meta']['code']);
+    }
+
+    
+    
+    /**
+     * function use test validate update user
+     * compare error code 1001
+     * @group validate_update_notok
+     * @dataProvider update_provider
+     */
+    public function test_validate_update_notok($test_data) {
+    	//
+    	//$User = $this->_user;
+    	$val = $this->_user->validate_update($test_data);
+    	//compare with error code 1001 when have data invalid    	
+    	//print_r($val);
+    	$this->assertEquals(1001, $val['meta']['code']);
+    	
+    }
+       
+    
+    /**
+     * Define test data set
+     *
+     * @return array Test data
+     */
+    public function update_provider() {
+    	$test_data = array();
+    	// Null firstname
+    	$test_data[][] = array(
+    			'firstname' => '',
+    			'lastname' => 'Lam',
+    			'email' => 'lam.vy@mulodo.com',
+    	);
+    	//null lastname
+    	$test_data[][] = array(
+    			'firstname' => 'thuyvy',
+    			'lastname' => '',
+    			'email' => 'lam.vy@mulodo.com',
+    	);
+    	//email incorrect
+    	$test_data[][] = array(
+    			'firstname' => 'Thuy vy',
+    			'lastname' => 'Lam',
+    			'email' => 'lam.vy.mulodo.com',
+    	);
+    	return $test_data;
+    }
+    /**
+     * function use test validate update user
+     * compare with true
+     * @group validate_update_ok
+     */
+    public function test_validate_update_ok() {
+    	//create data valid to test
+    	$test_data = array();
+    	$test_data = array(
+    			'lastname' => 'Lam',
+    			'firstname' => 'thuy vy',
+    			'email' => 'lam.vy@mulodo.com',
+    			
+    	);
+    
+    	//$User = $this->_user;
+    	$val =User::validate_update($test_data);    
+    	//compare with true when have data valid    	
+    	$this->assertTrue($val);
+    
+    }
+    
+    /**
+     * function use test get user info by id 
+     * @group get_user_ok
+     */
+    public function test_get_userinfo_ok() {
+    	//expected data use to compare
+    	$user = array (
+    		'id' => '88',
+    		'username' => 'kenny3',
+    		'firstname' => 'vy',
+    		'lastname' => 'lam' ,
+    		'email' => 'lam.vy@gmail.com' ,
+    		'created_at' => '1417675134',
+    		'modified_at' => '1417675134',
+    	);
+    	//call get user info by id =30
+    	$data = $this->_user->get_user_by_id(88);
+    	
+    	$this->assertEquals($user['id'], $data['id']);
+    	$this->assertEquals($user['username'], $data['username']);
+    	$this->assertEquals($user['lastname'], $data['lastname']);
+    	$this->assertEquals($user['firstname'], $data['firstname']);
+    	$this->assertEquals($user['email'], $data['email']);
+    	$this->assertEquals($user['created_at'], $data['created_at']);
+    	$this->assertEquals($user['modified_at'], $data['modified_at']);
+    	
+    }
+    
+    /**
+     * function use test get user info by id but not ok
+     * compare with error 2004
+     * @group get_user_notok
+     */
+    public function test_get_userinfo_notok() { 
+    	//id  = 1 not exist in db
+    	$data = $this->_user->get_user_by_id(1);
+    	//compare with error code 2004
+    	//print_r($data);
+    	$this->assertEquals(2004, $data['meta']['code']);
+    }
+    /**
+     * function use test update user info by id
+     * compare with expected after update info
+     * @group update_user
+     */
+    public function test_put_update() {
+    	//expected data use to compare
+    	//lastname, firstname, email use to update when function update_user called
+    	$user = array (
+    			'id' => '88',
+    			'username' => 'kenny3',
+    			'firstname' => 'vy2',
+    			'lastname' => 'lam2' ,
+    			'email' => 'lam.vy2@mulodo.com',
+    			
+    	);
+    	//call update user info by id = 88
+    	$data = $this->_user->update_user($user);
+    	$this->assertEquals($user['id'], $data['id']);
+    	$this->assertEquals($user['username'], $data['username']);
+    	$this->assertEquals($user['lastname'], $data['lastname']);
+    	$this->assertEquals($user['firstname'], $data['firstname']);
+    	$this->assertEquals($user['email'], $data['email']);
+    	//call update user info return old data
+    	//use run test get user info
+    	$this->reset_data_update();
+    }
+    
+    /**
+     * function used reset data after call update
+     */
+    public function reset_data_update() {
+    	//data reset
+    	$password = Auth::hash_password('12345');
+    	$user = array (
+    			'id' => '88',
+    			'firstname' => 'vy',
+    			'lastname' => 'lam' ,
+    			'email' => 'lam.vy@gmail.com',
+    			'modified_at' => '1417675134',
+    			'password' => $password,
+    
+    	);
+    	//update reset user info id 88
+    	$query = DB::update('user')->set(
+		    	     array(
+		    			'firstname' => $user['firstname'] ,
+		    			'lastname' => $user['lastname'] ,
+		    			'email' => $user['email'] ,
+		    			'modified_at' => $user['modified_at'],
+		    	     	'password' => $password
+		    		 ))->where('id', $user['id'])->execute();
+    	
+    	
+    }
+    
+    /**
+     * function use test get user info by id
+     * @param input is user id
+     * compare with expected user info
+     * @group get_info_ok
+     */
+    public function test_get_user_info_ok() {
+    	//expected data use to compare
+    	$user = array (
+    			'id' => '88',
+    			'username' => 'kenny3',
+    			'firstname' => 'vy',
+    			'lastname' => 'lam' ,
+    			'email' => 'lam.vy@gmail.com' ,
+    			'created_at' => '1417675134',
+    			'modified_at' => '1417675134',
+    	);
+    	//call get user info by id =88
+    	//function get_user_info use package ORM
+    	$data = $this->_user->get_user_info(88);
+    	
+    	$this->assertEquals($user['id'], $data['data']['id']);
+    	$this->assertEquals($user['username'], $data['data']['username']);
+    	$this->assertEquals($user['lastname'], $data['data']['lastname']);
+    	$this->assertEquals($user['firstname'], $data['data']['firstname']);
+    	$this->assertEquals($user['email'], $data['data']['email']);
+    	$this->assertEquals($user['created_at'], $data['data']['created_at']);
+    	$this->assertEquals($user['modified_at'], $data['data']['modified_at']);
+    }
+    
+    /**
+     * function use test get user info by id
+     * the id not exist in db
+     * @param input is user id
+     * compare with false
+     * @group get_info_notok
+     * @dataProvider id_provider
+     */
+    public function test_get_user_info_notok($id) {
+    	
+    	//the user id not exist in db
+    	$result = $this->_user->get_user_info($id);
+    	//compare with false
+    	//failure 1 for id 30 b/c it exist in db.
+    	$this->assertFalse($result);
+    }
+    
+    /**
+     * Define test data set
+     *
+     * @return array Test data
+     */
+    public function id_provider() {
+    	$test_data = array();
+    	//create data from 0-10 - id is not exist in db except id 30
+    	for ($i = 0; $i < 40; $i++) {
+    		$test_data[][] = $i;
+    	}
+    	//return array test data provider
+    	return $test_data;
+    	
+    }
+    /**
+	 * funtion to test validate password input to change new pass
+	 * @group validate_password
+	 * @dataProvider password_provider	
+	 */
+	public function test_validate_password_notok($data) {
+						
+		$val = $this->_user->validate_password($data['password']);						
+		//print_r($val['meta']['message']);
+		
+		$this->assertEquals(1004, $val['meta']['code']);
+		//print_r($val);
+		
+	}
+	/**
+	 * funtion to test validate password input to change new pass
+	 * @group validate_password_ok
+	 * 
+	 */
+	public function test_validate_password_ok() {
+	
+		$password = 'aaa456';
+		$val = $this->_user->validate_password($password);
+		//print_r($val['meta']['message']);
+	
+		$this->assertTrue($val);
+		
+	
+	}
+	/**
+	 * function to test update new password is ok
+	 * @group update_pass_ok
+	 */
+	public function test_change_password_ok() {
+	
+		$id = '88' ;
+		$old_password = '12345';
+		$new_password = 'aaa456';
+		//call function to test update
+		$rs = $this->_user->change_password($id, $old_password, $new_password);
+		//compare with code 200 is success
+		$this->assertEquals('200', $rs['meta']['code']);
+		//reset data
+		
+		$this->reset_data_update();	
+	}
+	
+	/**
+	 * function to test update new password not ok
+	 * b/c the old password inputed is not match with db
+	 * compare with error 2004
+	 * @group update_pass_notok 
+	 */
+	public function test_change_password_notok() {
+		$id = '88' ;
+		$old_password = '123456';
+		$new_password = 'aaa456';
+		//call function to test update
+		$rs = $this->_user->change_password($id, $old_password, $new_password);
+		//compare with code 200 is success
+		$this->assertEquals('2004', $rs['meta']['code']);
+	}
+	/**
+	 * Define test data set
+	 *
+	 * @return array password
+	 */
+	public function password_provider() {
+		$test_data = array();
+		
+		//null password
+		$test_data[][] = array(
+			'password' => '',
+		);
+		//password at least 5 characters
+		$test_data[][] = array(
+			'password' => '123',
+		);
+		//password contain greater than 50 char
+		$test_data[][] = array(
+			'password' => 'weudhweuiryuiw4y5377846127361825376154yrhesjbfseufhiosuou897284647',
+		);
+		//password contain special char
+		$test_data[][] = array(
+			'password' => ' jhbfsh@#$@#%',
+		);
+		//return array test data provider
+		return $test_data;
+		 
+	}
+	
+	/**
+	 * function to test search user have result 
+	 * input keyword 
+	 * compare with count row data result > 0
+	 * @group search_user_ok
+	 * @dataProvider search_provider
+	 */
+	public function test_search_user_ok($test_data) {
+		$name = $test_data['name'];
+		$result = $this->_user->search_user($name);
+		//assert row return greater 0
+		$this->assertGreaterThan(0, count($result)); 
+	}
+	/**
+	 * function to test search user not have any result
+	 * input keyword
+	 * compare with count row data result = 0
+	 * @group search_user_notok
+	 * @dataProvider search_not_match_provider
+	 */
+	public function test_search_user_not_match($test_data) {
+		$name = $test_data['name'];
+		$result = $this->_user->search_user($name);
+		//assert row return greater 0
+		$this->assertEquals(0, count($result));
+	}
+	/**
+	 * Define test data set
+	 * use for search user
+	 * @return array keyword
+	 */
+	public function search_provider() {
+		$test_data = array();
+	
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'thuy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'vy',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'lam',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'nga77',
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+    
+	/**
+	 * Define test data set
+	 * use for search user not ok
+	 * @return array keyword
+	 */
+	public function search_not_match_provider() {
+		$test_data = array();
+	
+		//the keyword contain 4 chars
+		$test_data[][] = array(
+				'name' => 'hanh',
+		);
+		//keyword at least 4 characters
+		$test_data[][] = array(
+				'name' => 'shu',
+		);
+		//the keyword = username
+		$test_data[][] = array(
+				'name' => 'shuri',
+		);
+		//return array test data provider
+		return $test_data;
+			
+	}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+* This comment is used for making conflict situation. This should be removed when you merged and resolved completely. 
+*
+*/
+
+
 }
